@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use IPC::Open3;
+use IO::Select;
+use Term::ANSIColor qw(:constants);
+$|++;
+my $CYAN  ="\x1b[0;2;36m" ;
+my $YELLOW="\x1b[1;35m" ;
+my $RED   ="\x1b[1;31m" ;
+my $GREEN ="\x1b[1;32m" ;
+my $BLUE  ="\x1b[1;34m" ;
+my $NO_COLOUR="\x1b[1;37;1m" ;
+
+my $pid;
+my $istty=-t STDIN;
+eval { $pid=open3(*WRITE, *READ, *ERROR, @ARGV); };
+
+if (!$pid) {
+	# if we get here, the fork succeeded, but the exec (likely) failed...
+	my $err = $@ ? $@ : "unknown error";
+	# exit child in any case
+	die "Error: Could not execute: $err";
+} else {
+	close(*WRITE);
+	my $selector=IO::Select->new();
+	$selector->add(*READ, *ERROR);
+	while(my @ready=$selector->can_read())
+	{
+		foreach my $fh (@ready)
+		{
+			my $count = sysread($fh, my $text, 1024);
+			$selector->remove($fh) if not $count;
+			if(fileno($fh)==fileno(*READ) && $istty)
+			{
+				foreach my $line (split(/\n/,$text)) {
+					$line =~ s/([^:]*):([0-9]+)([:0-9]*)(: error:)(.*)/${RED}$1${CYAN}:$2$3$YELLOW$4${RED}$5$NO_COLOUR/sgmi ;
+					$line =~ s/([^:]*):([0-9]+)([:0-9]*)(: warning:)(.*)/${RED}$1${CYAN}:$2$3$GREEN$4$NO_COLOUR$5$NO_COLOUR/sgmi ;
+					print( $line,"\n" );
+				}
+
+			} elsif(fileno($fh)==fileno(*ERROR) && $istty)
+			{
+				$text =~ s/([^:]*):([0-9]+)([:0-9]*)(: [a-zA-Z]*error:)(.*)/${RED}$1${CYAN}:$2$3$YELLOW$4${RED}$5$NO_COLOUR/g ;
+				$text =~ s/([^:]*):([0-9]+)([:0-9]*)(: [a-zA-Z]*warning:)(.*)/${RED}$1${CYAN}:$2$3$GREEN$4$NO_COLOUR$5$NO_COLOUR/g ;
+				print( $text );
+			}
+		}
+	}
+}
+waitpid( $pid, 0 );
+my $exitstat = $? >> 8;
+exit($exitstat) ;

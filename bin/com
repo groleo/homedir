@@ -1,0 +1,13 @@
+#! /bin/bash
+
+
+if [ "" = "$SRC_DIR" ]; then
+	SRC_DIR="`pwd`"
+fi
+
+FILE="$1"
+if [ ! -f "$FILE" ]; then
+	FILE="`find . -name $1`"
+fi
+
+meld $SRC_DIR/$FILE $DST_DIR/$FILE &>/dev/null

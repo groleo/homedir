@@ -1,0 +1,138 @@
+!xterm*eightBitOutput:   True
+!xterm*eightBitInput:   True
+!xterm*metaSendsEscape: True
+
+! xterm translations to make VED work
+!xterm*VT100*Translations: #override \
+!    <Key>KP_0: string(0x1b) string("Op") \n\
+!    <Key>KP_Insert: string(0x1b) string("Op") \n\
+!    <Key>KP_Decimal: string(0x1b) string("On") \n\
+!    <Key>KP_Delete: string(0x1b) string("On") \n\
+!    <Key>KP_Home: string(0x1b) string("Ow") \n\
+!    <Key>KP_7: string(0x1b) string("Ow") \n\
+!    <Key>KP_Prior: string(0x1b) string("Oy") \n\
+!    <Key>KP_9: string(0x1b) string("Oy") \n\
+!    <Key>KP_Next: string(0x1b) string("Os") \n\
+!    <Key>KP_1: string(0x1b) string("Oq") \n\
+!    <Key>KP_End: string(0x1b) string("Oq") \n\
+!    <Key>KP_3: string(0x1b) string("Os")
+
+!XTerm*color1:          #aa0000
+!XTerm*color2:          #00aa00
+!XTerm*color3:          #aa5500
+!XTerm*color4:          #0000aa
+!XTerm*color5:          #aa00aa
+!XTerm*color6:          #00aaaa
+!XTerm*color7:          #aaaaaa
+!XTerm*color8:          #555555
+!XTerm*color9:          #ff5555
+!XTerm*color10:         #55ff55
+!XTerm*color11:         #ffff55
+!XTerm*color12:         #5555ff
+!XTerm*color13:         #ff55ff
+!XTerm*color14:         #55ffff
+!XTerm*color15:         #ffffff
+
+!-----------------------------	TAB-BAR OPTIONS ------------------------------ #
+Mrxvt.bottomTabbar:	True
+Mrxvt.autohideTabbar:	True
+Mrxvt.maxTabWidth:	17
+Mrxvt.highlightTabOnBell:	True
+Mrxvt.syncTabTitle:	False
+Mrxvt.showMenu:		False
+Mrxvt.sessionMgt:	True
+
+Mrxvt.itabForeground:		#909090
+Mrxvt.itabBackground:		#101010
+Mrxvt.tabForeground:		#9a9a9a
+Mrxvt.tabBackground:		#00009a
+
+
+!Mrxvt.itabBackground:		#1010aa
+!Mrxvt.tabBackground:		#606060
+!Mrxvt.itabForeground:		#909090
+!Mrxvt.tabForeground:		#000000
+! ---------------------- SCROLLING / SCROLLBAR OPTIONS ----------------------- #
+Mrxvt.scrollbarRight:	True
+Mrxvt.scrollbarStyle:	rxvt
+Mrxvt.scrollColor:		#808080
+Mrxvt.scrollTtyOutputInhibit:	True
+Mrxvt.scrollTtyKeypress:	True
+!Mrxvt.troughColor:		#202020
+Mrxvt.saveLines:		10000
+! ---------------------------------- CURSOR ---------------------------------- #
+Mrxvt.cursorBlink:		True
+Mrxvt.cursorBlinkInterval:	800
+Mrxvt.cursorColor:		#ff6622
+Mrxvt.cursorColor2:		#000000
+! ---------------------------------- FONTS ----------------------------------- #
+!Mrxvt*decTerminalID:	220
+Mrxvt.font:             10x20
+!Mrxvt.font: -*-dejavu sans mono-medium-r-normal-*-*-*-*-*-*-*-*-*
+!Mrxvt.font: -monotype-andale mono-*-*-*-*-*-*-*-*-*-*-*-1
+Mrxvt.boldFont:         10x20bold
+Mrxvt.background:	#000000
+Mrxvt.foreground:       yellow
+!Mrxvt.colorBD:          green
+!Mrxvt.colorUL:          #00aaaa
+!Mrxvt.pointerColor:     LightSlateBlue
+!Mrxvt.transparent:      no
+!Mrxvt.tintingType:      or
+!Mrxvt.tinting:          #ffffff
+Mrxvt.loginShell:       True
+Mrxvt.cutChars:			:=/~#@?%&_-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0abcdefghijklmnopqrstuvwxyz
+
+!Mrxvt*fading:		90
+
+Mrxvt.initProfileList:	    0,1
+
+
+!dont activate cause it slows down the start
+!Mrxvt*shading: 80
+!Mrxvt*transpscrollbar: False
+Mrxvt*geometry:         125x25
+
+
+Mrxvt*macro*Alt+1: GotoTab 1
+Mrxvt*macro*Alt+2: GotoTab 2
+Mrxvt*macro*Alt+3: GotoTab 3
+Mrxvt*macro*Alt+4: GotoTab 4
+Mrxvt*macro*Alt+5: GotoTab 5
+Mrxvt*macro*Alt+6: GotoTab 6
+Mrxvt*macro*Alt+7: GotoTab 7
+Mrxvt*macro*Alt+8: GotoTab 8
+Mrxvt*macro*Alt+9: GotoTab 9
+
+Mrxvt.macro.Ctrl+n: NewTab "%G"
+Mrxvt.macro.Shift+Left: GotoTab -1
+Mrxvt.macro.Shift+Right: GotoTab +1
+Mrxvt.macro.Shift+Insert: Paste
+Mrxvt.macro.Shift+Prior: Scroll -1p
+Mrxvt.macro.Shift+Next: Scroll 1p
+Mrxvt.macro.Shift+Up: Scroll -1
+Mrxvt.macro.Shift+Down: Scroll 1
+Mrxvt.internalBorder:		0
+
+!XTerm*font:             -*-terminus-medium-*-*-*-14-*-*-*-*-*-*-*
+!XTerm*boldFont:         -*-terminus--*-*-*-14-*-*-*-*-*-*-*
+!XTerm*font: 9x15
+!XTerm*boldFont:9x15bold
+!XTerm*background:       black
+!XTerm*foreground:       grey60
+!XTerm*scrollBar:        True
+!XTerm*scrollBar_right:  True
+!XTerm*saveLines:	10000
+!XTerm*loginShell:       True
+!XTerm*colorBD:          white
+!XTerm*colorBD:          green
+!XTerm*colorUL:          #00aaaa
+!XTerm*pointerColor:     LightSlateBlue
+!XTerm*transparent:	False
+!XTerm*tintingType:      or
+!XTerm*tinting:          #ffffff
+!XTerm*fading:	90
+
+!dont activate cause it slows down the start
+!XTerm*shading: 80
+!XTerm*transpscrollbar: False
+!XTerm*geometry:         138x30

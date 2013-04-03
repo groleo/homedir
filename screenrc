@@ -1,0 +1,36 @@
+altscreen on
+#hardstatus alwayslastline
+#hardstatus alwayslastline "%{= mK}%-Lw%{= RW}%50>%n%f* %t%{= mK}%+Lw%< %{= kG}%-=%D %d %M %Y %c:%s%{-}"
+ hardstatus alwayslastline "%{= by}%-Lw%{= rW}%50>%n%f* %t%{= by}%+Lw%< %{= kG}%-=%D %d %M %Y %c:%s%{-}"
+#hardstatus alwayslastline "%-Lw%{= RW}%50>%n%f* %t%{-}%+Lw%<"
+defscrollback 5000
+vbell off
+startup_message off
+# Turns off alternate screen switching in xterms,
+# so that text in screen will go into the xterm's scrollback buffer:
+#termcapinfo xterm|xterms|xs|rxvt ti@:te@
+#termcapinfo xterm 'hs:ts=\E]2;:fs=\007:ds=\E]2;screen\007'
+#term xterm
+term xterm-color
+termcapinfo xterm|xterm-color|rxvt ti@:te@
+
+# restore window contents after using (e.g.) vi
+altscreen on
+
+# If a window goes unresponsive, don't block the whole session waiting for it.
+nonblock on
+
+# Monitor windows
+defmonitor on
+activity ""
+bind c screen 1
+bind ^c screen 1
+
+bind 0 select 10
+screen 1
+# Make activity messages yellow on black
+sorendition =s Yk
+
+#caption always '%{= dg} %H %{G}| %{B}%l %{G}|%=%?%{d}%-w%?%{r}(%{d}%n %t%? {%u} %?%{r})%{d}%?%+w%?%=%{G}| %{B}%M %d %c:%s '
+
+
