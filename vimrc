@@ -317,7 +317,7 @@ endfunction
 inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 
 function! SetTab(width)
-      set noexpandtab
+      set expandtab
       "set expandtab           "use spaces instead of tabs
       "set softtabstop=a:width       "spaces to insert when <Tab> is pressed
       "Number of spaces that a <Tab> in the file counts for

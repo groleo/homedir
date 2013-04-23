@@ -1,18 +1,20 @@
-#! /bin/bash
+#! /bin/bash -e
 
 ###########################################
 # Packages
 ###########################################
-_basic="vim vim-nox vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff"
+_basic="vim vim-nox vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server"
 _dev="gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
-_mesa="xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
+_mesa="g++ xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
+_wayland="autoconf libtool sudo autopoint intltool"
 _scm_basic="git git-doc"
 _scm_extra="git-cvs git-svn git-email subversion"
 sudo -E apt-get install \
 	$_basic \
 	$_dev \
 	$_mesa \
-    $_scm_basic
+	$_wayland \
+	$_scm_basic
 
 	#xclip \
 	#cpulimit \
@@ -40,6 +42,15 @@ git config --global sendemail.piglit.from "Adrian Negreanu <groleo@gmail.com>"
 git config --global sendemail.systemtap.to "systemtap@sourceware.org"
 git config --global sendemail.systemtap.from "Adrian Negreanu <groleo@gmail.com>"
 
+if [ ! -d homedir ]; then
+	git clone https://github.com/groleo/homedir.git
+else
+	cd homedir
+	git pull
+	cd -
+fi
+
+cd homedir
 
 rm -f ${HOME}/.bash_env
 ln -sf $PWD/bash_env ${HOME}/.bash_env
