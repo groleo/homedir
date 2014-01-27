@@ -5,6 +5,9 @@
 # The Autoconf generated configure script is a good reference as to what is permitted.
 # Basically, it should be able to run in a Bourne shell.
 
+set +e
+set +x
+
 envoptions() {
 cat << EOF
 Environment variables specific to wbuild.sh:
@@ -58,6 +61,42 @@ Environment variables defined by the pkg-config system:
               \$DESTDIR/\$DATADIR/pkgconfig and
               \$DESTDIR/\$LIBDIR/pkgconfig are prepended
 EOF
+}
+
+usage() {
+    basename="`expr "//$0" : '.*/\([^/]*\)'`"
+    envoptions
+    echo ""
+    echo "Usage: $basename [options] [prefix]"
+    echo "Options:"
+    echo "  -h,--help   Display this help and exit successfully"
+    echo "  -a          Do NOT run auto config tools (autogen.sh, configure)"
+    echo "  -b          Use .build.unknown build directory"
+    echo "  -c          Run make clean in addition to \"all install\""
+    echo "  -D          Run make dist in addition to \"all install\""
+    echo "  -d          Run make distcheck in addition \"all install\""
+    echo "  -g          Compile and link with debug information"
+    echo "  -n          Do not quit after error; just print error message"
+    echo "  -o <module/component>       Build just this <module/component>"
+    echo "  -r <module/component>       Resume build from <module/component>"
+    echo "  -s <sudo>   The command name providing superuser privilege"
+    echo "  -C,--clone  Clone non-existing repositories (uses \$GITROOT if set)"
+    echo "  -P,--pull   Update source code before building (git pull --rebase)"
+    echo "  --autoresume <file>"
+    echo "              Append module being built to, and autoresume from, <file>"
+    echo "  --check     Run make check in addition \"all install\""
+    echo "  --cmd <cmd> Execute arbitrary git, gmake, or make command <cmd>"
+    echo "  --confflags <options>"
+    echo "              Pass <options> to autgen.sh/configure of all modules"
+    echo "  --modfile <file>"
+    echo "              Only process the module/components specified in <file>"
+    echo "              Any text after, and on the same line as, the module/component"
+    echo "              is assumed to be configuration options for the configuration"
+    echo "              of each module/component specifically"
+    echo "  --run <extra-arguments>"
+    echo "              Run weston passing extra-arguments to it"
+    echo "  --retry-v1  Remake 'all' on failure with Automake silent rules disabled"
+    echo "  -L          Just list modules to build"
 }
 
 setup_buildenv() {
@@ -162,7 +201,7 @@ module_title() {
     confopts="$3"
     # preconds
     if [ X"$module" = X ]; then
-    return
+        return
     fi
 
     echo ""
@@ -171,7 +210,7 @@ module_title() {
     echo "==        configuration options:  $CONFFLAGS $confopts"
 }
 
-checkfortars() {
+check_for_tars() {
     module=$1
     component=$2
     case $module in
@@ -270,10 +309,10 @@ checkfortars() {
                         TAROPTS=xzf
                     fi
                     tar $TAROPTS $TARFILE -C $ii
-            if [ $? -ne 0 ]; then
-            failed tar $module $component
-            return 1
-            fi
+                    if [ $? -ne 0 ]; then
+                        failed tar $module $component
+                        return 1
+                    fi
                 fi
                 return 0
             fi
@@ -302,6 +341,24 @@ clone() {
     fi
 
     case $module in
+    "xkbcommon")
+        BASEDIR=""
+        ;;
+    "libhybris")
+        BASEDIR=""
+        ;;
+    "atgreen")
+        BASEDIR=""
+        ;;
+    "core")
+        BASEDIR=""
+        ;;
+    "dbus")
+        BASEDIR=""
+        ;;
+    "fontconfig")
+        BASEDIR=""
+        ;;
     "pixman")
         BASEDIR=""
         ;;
@@ -315,6 +372,12 @@ clone() {
         BASEDIR=""
         ;;
     "cairo")
+        BASEDIR=""
+        ;;
+    "simple-yuv")
+        BASEDIR=""
+        ;;
+    "freetype")
         BASEDIR=""
         ;;
     "xkeyboard-config")
@@ -336,30 +399,32 @@ clone() {
             clonefailed_components="$clonefailed_components $module/$component"
             return 1
         fi
-    old_pwd=`pwd`
-    cd $DIR
-    if [ $? -ne 0 ]; then
-            echo "Failed to cd to $module module component $component. Ignoring."
-            clonefailed_components="$clonefailed_components $module/$component"
-            return 1
-    return 1
-    fi
-    git submodule init
+        old_pwd=`pwd`
+
+        cd $DIR
+        if [ $? -ne 0 ]; then
+                echo "Failed to cd to $module module component $component. Ignoring."
+                clonefailed_components="$clonefailed_components $module/$component"
+                return 1
+        fi
+
+        git submodule init
         if [ $? -ne 0 ]; then
             echo "Failed to initialize $module module component $component submodule. Ignoring."
             clonefailed_components="$clonefailed_components $module/$component"
             return 1
         fi
-    git submodule update
+
+        git submodule update
         if [ $? -ne 0 ]; then
             echo "Failed to update $module module component $component submodule. Ignoring."
             clonefailed_components="$clonefailed_components $module/$component"
             return 1
         fi
-    cd ${old_pwd}
+        cd ${old_pwd}
     else
         echo "git cannot clone into an existing directory $module/$component"
-    return 1
+        return 1
     fi
 
     return 0
@@ -381,26 +446,26 @@ process() {
     confopts="$3"
     # preconds
     if [ X"$module" = X ]; then
-    echo "process() required first argument is missing"
-    return 1
+        echo "process() required first argument is missing"
+        return 1
     fi
 
     module_title $module "$component" "$confopts"
 
     SRCDIR=""
     CONFCMD=""
+    if [ X"$CLONE" != X ]; then
+        clone $module $component
+        needs_config=1
+    fi
     if [ -f $module/$component/autogen.sh ]; then
         SRCDIR="$module/$component"
         CONFCMD="autogen.sh"
-    elif [ X"$CLONE" != X ]; then
-        clone $module $component
-        if [ $? -eq 0 ]; then
+    elif [ -f $module/$component/configure ]; then
         SRCDIR="$module/$component"
-        CONFCMD="autogen.sh"
-        fi
-    needs_config=1
+        CONFCMD="configure"
     else
-        checkfortars $module $component
+        check_for_tars $module $component
         CONFCMD="configure"
     fi
 
@@ -413,144 +478,147 @@ process() {
     old_pwd=`pwd`
     cd $SRCDIR
     if [ $? -ne 0 ]; then
-    failed cd1 $module $component
-    return 1
+        failed cd1 $module $component
+        return 1
     fi
 
     if [ X"$GITCMD" != X ]; then
-    $GITCMD
-    rtn=$?
-    cd $old_pwd
+        $GITCMD
+        rtn=$?
+        cd $old_pwd
 
-    if [ $rtn -ne 0 ]; then
-        failed "$GITCMD" $module $component
-        return 1
-    fi
-    return 0
+        if [ $rtn -ne 0 ]; then
+            failed "$GITCMD" $module $component
+            return 1
+        fi
+        return 0
     fi
 
     if [ X"$PULL" != X ]; then
-    git pull --rebase
-    if [ $? -ne 0 ]; then
-        failed "git pull" $module $component
-        cd $old_pwd
-        return 1
-    fi
-    # The parent module knows which commit the submodule should be at
-    git submodule update
+        git pull --rebase
         if [ $? -ne 0 ]; then
-        failed "git submodule update" $module $component
+            failed "git pull" $module $component
+            cd $old_pwd
+            return 1
+        fi
+        # The parent module knows which commit the submodule should be at
+        git submodule update
+        if [ $? -ne 0 ]; then
+            failed "git submodule update" $module $component
             return 1
         fi
     fi
 
     # Build outside source directory
     if [ X"$DIR_ARCH" != X ] ; then
-    mkdir -p "$DIR_ARCH"
-    if [ $? -ne 0 ]; then
-        failed mkdir $module $component
-        cd $old_pwd
-        return 1
-    fi
-    cd "$DIR_ARCH"
-    if [ $? -ne 0 ]; then
-        failed cd2 $module $component
-        cd ${old_pwd}
-        return 1
-    fi
+        mkdir -p "$DIR_ARCH"
+        if [ $? -ne 0 ]; then
+            failed mkdir $module $component
+            cd $old_pwd
+            return 1
+        fi
+        cd "$DIR_ARCH"
+        if [ $? -ne 0 ]; then
+            failed cd2 $module $component
+            cd ${old_pwd}
+            return 1
+        fi
     fi
 
     # Use "sh autogen.sh" since some scripts are not executable in CVS
     if [ $needs_config -eq 1 ] || [ X"$NOAUTOGEN" = X ]; then
-    sh ${DIR_CONFIG}/${CONFCMD} \
-        ${PREFIX_USER:+--prefix="$PREFIX"} \
-        ${EPREFIX_USER:+--exec-prefix="$EPREFIX"} \
-        ${BINDIR_USER:+--bindir="$BINDIR"} \
-        ${DATAROOTDIR_USER:+--datarootdir="$DATAROOTDIR"} \
-        ${DATADIR_USER:+--datadir="$DATADIR"} \
-        ${LIBDIR_USER:+--libdir="$LIBDIR"} \
-        ${LOCALSTATEDIR_USER:+--localstatedir="$LOCALSTATEDIR"} \
-        ${QUIET:+--quiet} \
-        ${CONFFLAGS} $confopts \
-        ${CC:+CC="$CC"} \
-        ${CPP:+CPP="$CPP"} \
-        ${CPPFLAGS:+CPPFLAGS="$CPPFLAGS"} \
-        ${CFLAGS:+CFLAGS="$CFLAGS"} \
-        ${LDFLAGS:+LDFLAGS="$LDFLAGS"}
-    if [ $? -ne 0 ]; then
-        failed ${CONFCMD} $module $component
-        cd $old_pwd
-        return 1
-    fi
+        autoreconf --force --install
+        set -x
+        sh ${DIR_CONFIG}/${CONFCMD} \
+            ${PREFIX_USER:+--prefix="$PREFIX"} \
+            ${EPREFIX_USER:+--exec-prefix="$EPREFIX"} \
+            ${BINDIR_USER:+--bindir="$BINDIR"} \
+            ${DATAROOTDIR_USER:+--datarootdir="$DATAROOTDIR"} \
+            ${DATADIR_USER:+--datadir="$DATADIR"} \
+            ${LIBDIR_USER:+--libdir="$LIBDIR"} \
+            ${LOCALSTATEDIR_USER:+--localstatedir="$LOCALSTATEDIR"} \
+            ${QUIET:+--quiet} \
+            ${CONFFLAGS} $confopts \
+            ${CC:+CC="$CC"} \
+            ${CPP:+CPP="$CPP"} \
+            ${CPPFLAGS:+CPPFLAGS="$CPPFLAGS"} \
+            ${CFLAGS:+CFLAGS="$CFLAGS"} \
+            ${LDFLAGS:+LDFLAGS="$LDFLAGS"}
+        set +x
+        if [ $? -ne 0 ]; then
+            failed ${CONFCMD} $module $component
+            cd $old_pwd
+            return 1
+        fi
     fi
 
     # A custom 'make' target list was supplied through --cmd option
     if [ X"$MAKECMD" != X ]; then
-    ${MAKE} $MAKEFLAGS $MAKECMD
-    rtn=$?
-    cd $old_pwd
+        ${MAKE} $MAKEFLAGS $MAKECMD
+        rtn=$?
+        cd $old_pwd
 
-    if [ $rtn -ne 0 ]; then
-        failed "$MAKE $MAKEFLAGS $MAKECMD" $module $component
-        return 1
-    fi
-    return 0
+        if [ $rtn -ne 0 ]; then
+            failed "$MAKE $MAKEFLAGS $MAKECMD" $module $component
+            return 1
+        fi
+        return 0
     fi
 
     if [ X"$CLEAN" != X ]; then
-    ${MAKE} $MAKEFLAGS clean
-    if [ $? -ne 0 ]; then
-        failed "$MAKE $MAKEFLAGS clean" $module $component
-        cd $old_pwd
-        return 1
+        ${MAKE} $MAKEFLAGS clean
+        if [ $? -ne 0 ]; then
+            failed "$MAKE $MAKEFLAGS clean" $module $component
+            cd $old_pwd
+            return 1
+        fi
     fi
 
-    fi
     ${MAKE} $MAKEFLAGS
     if [ $? -ne 0 ]; then
-    # Rerun with Automake silent rules disabled to see failing gcc statement
-    if [ X"$RETRY_VERBOSE" != X ]; then
-        echo ""
-        echo "wbuild.sh: Rebuilding $component with Automake silent rules disabled"
-        ${MAKE} $MAKEFLAGS V=1
-    fi
-    failed "$MAKE $MAKEFLAGS" $module $component
-    cd $old_pwd
-    return 1
+        # Rerun with Automake silent rules disabled to see failing gcc statement
+        if [ X"$RETRY_VERBOSE" != X ]; then
+            echo ""
+            echo "wbuild.sh: Rebuilding $component with Automake silent rules disabled"
+            ${MAKE} $MAKEFLAGS V=1
+        fi
+        failed "$MAKE $MAKEFLAGS" $module $component
+        cd $old_pwd
+        return 1
     fi
 
     if [ X"$CHECK" != X ]; then
-    ${MAKE} $MAKEFLAGS check
-    if [ $? -ne 0 ]; then
-        failed "$MAKE $MAKEFLAGS check" $module $component
-        cd $old_pwd
-        return 1
-    fi
+        ${MAKE} $MAKEFLAGS check
+        if [ $? -ne 0 ]; then
+            failed "$MAKE $MAKEFLAGS check" $module $component
+            cd $old_pwd
+            return 1
+        fi
     fi
 
     if [ X"$DIST" != X ]; then
-    ${MAKE} $MAKEFLAGS dist
-    if [ $? -ne 0 ]; then
-        failed "$MAKE $MAKEFLAGS dist" $module $component
-        cd $old_pwd
-        return 1
-    fi
+        ${MAKE} $MAKEFLAGS dist
+        if [ $? -ne 0 ]; then
+            failed "$MAKE $MAKEFLAGS dist" $module $component
+            cd $old_pwd
+            return 1
+        fi
     fi
 
     if [ X"$DISTCHECK" != X ]; then
-    ${MAKE} $MAKEFLAGS distcheck
-    if [ $? -ne 0 ]; then
-        failed "$MAKE $MAKEFLAGS distcheck" $module $component
-        cd $old_pwd
-        return 1
-    fi
+        ${MAKE} $MAKEFLAGS distcheck
+        if [ $? -ne 0 ]; then
+            failed "$MAKE $MAKEFLAGS distcheck" $module $component
+            cd $old_pwd
+            return 1
+        fi
     fi
 
     $SUDO env LD_LIBRARY_PATH=$LD_LIBRARY_PATH ${MAKE} $MAKEFLAGS install
     if [ $? -ne 0 ]; then
-    failed "$SUDO env LD_LIBRARY_PATH=$LD_LIBRARY_PATH $MAKE $MAKEFLAGS install" $module $component
-    cd $old_pwd
-    return 1
+        failed "$SUDO env LD_LIBRARY_PATH=$LD_LIBRARY_PATH $MAKE $MAKEFLAGS install" $module $component
+        cd $old_pwd
+        return 1
     fi
 
     cd ${old_pwd}
@@ -572,41 +640,41 @@ build() {
     component=$2
     confopts="$3"
     if [ X"$LISTONLY" != X ]; then
-    echo "$module/$component"
-    return 0
+        echo "$module/$component"
+        return 0
     fi
 
     if [ X"$RESUME" != X ]; then
-    if [ X"$RESUME" = X"$module/$component" ]; then
-        unset RESUME
-        # Resume build at this module
-    else
-        echo "Skipping $module module component $component..."
-        return 0
-    fi
+        if [ X"$RESUME" = X"$module/$component" ]; then
+            unset RESUME
+            # Resume build at this module
+        else
+            echo "Skipping $module module component $component..."
+            return 0
+        fi
     fi
 
     process $module "$component" "$confopts"
     process_rtn=$?
     if [ X"$BUILT_MODULES_FILE" != X ]; then
-    if [ $process_rtn -ne 0 ]; then
-        echo "FAIL: $module/$component" >> $BUILT_MODULES_FILE
-    else
-        echo "PASS: $module/$component" >> $BUILT_MODULES_FILE
-    fi
+        if [ $process_rtn -ne 0 ]; then
+            echo "FAIL: $module/$component" >> $BUILT_MODULES_FILE
+        else
+            echo "PASS: $module/$component" >> $BUILT_MODULES_FILE
+        fi
     fi
 
     if [ $process_rtn -ne 0 ]; then
-    echo "wbuild.sh: error processing module/component:  \"$module/$component\""
-    if [ X"$NOQUIT" = X ]; then
-        exit 1
-    fi
-    return $process_rtn
+        echo "wbuild.sh: error processing module/component:  \"$module/$component\""
+        if [ X"$NOQUIT" = X ]; then
+            exit 1
+        fi
+        return $process_rtn
     fi
 
     if [ X"$BUILD_ONE" != X ]; then
-    echo "Single-component build complete"
-    exit 0
+        echo "Single-component build complete"
+        exit 0
     fi
 }
 ################################################################3
@@ -616,6 +684,8 @@ build() {
 build_proto() {
     build proto x11proto
     build proto dri2proto
+    build proto dri3proto
+    build proto presentproto
     build proto fixesproto
     build proto glproto
     build proto kbproto
@@ -623,17 +693,17 @@ build_proto() {
     build proto inputproto
     build proto damageproto
     build proto renderproto
+#      build proto compositeproto
     build xcb proto
 }
-
-# bitmaps is needed for building apps, so has to be done separately first
-# cursors depends on apps/xcursorgen
-# xkbdata is obsolete - use xkbdesc from xkeyboard-config instead
-build_data() {
-#    build data bitmaps
-    build data cursors
+build_libxkbcommon() {
+    local GITROOT="git://github.com"
+    build xkbcommon libxkbcommon "--with-xkb-config-root=$PREFIX/share/X11/xkb/"
 }
-
+build_libffi() {
+    local GITROOT="git://github.com"
+    build atgreen libffi
+}
 # All protocol modules must be installed before the libs (okay, that's an
 # overstatement, but all protocol modules should be installed anyway)
 #
@@ -650,7 +720,7 @@ build_data() {
 #
 build_lib() {
     build lib libxtrans
-    build lib libXau 
+    build lib libXau
     build xcb pthread-stubs
     build xcb libxcb
     build lib libX11
@@ -659,28 +729,27 @@ build_lib() {
     build lib libXrender
     build lib libXdamage
     build lib libXcursor
-
-
+    build lib libxshmfence
+#      build lib libXfixes
+#      build lib libXcomposite
     build lib libpciaccess
-    build lib libxkbcommon "--with-xkb-config-root=/usr/share/X11/xkb"
-    build pixman ""
-}
-
-# Most apps depend at least on libX11.
-#
-# bdftopcf depends on libXfont
-# mkfontscale depends on libfontenc and libfreetype
-# mkfontdir depends on mkfontscale
-#
-# TODO: detailed breakdown of which apps require which libs
-build_app() {
-    :
+    build_libxkbcommon
+    build_libffi
 }
 
 build_mesa() {
+    build mesa mesa "--enable-gles2 --disable-gallium-egl --with-gallium-drivers="" --with-egl-platforms=wayland,drm --enable-gbm --enable-shared-glapi"
+}
+
+build_hybris() {
+    local GITROOT="git://github.com" #/libhybris/libhybris"
+    build libhybris hybris "--enable-wayland --enable-arch=x86 --enable-trace --with-android-headers=`pwd`/android-headers --enable-alinker=jb"
+}
+
+build_gl() {
     build mesa drm  "--enable-nouveau-experimental-api"
-    build mesa mesa "--enable-gles2 --disable-gallium-egl --with-gallium-drivers="" --with-egl-platforms=wayland,x11,drm --enable-gbm --enable-shared-glapi"
-    #build mesa mesa "--enable-gles2 --disable-gallium-egl --with-gallium-drivers="" --with-egl-platforms=wayland,drm --enable-gbm --enable-shared-glapi"
+    build_mesa
+    #build_hybris
 }
 
 # The server requires at least the following libraries:
@@ -690,62 +759,46 @@ build_wayland() {
 }
 
 build_weston() {
-    build wayland weston "--with-cairo-glesv2 --disable-setuid-install --disable-xwayland --enable-drm-compositor --enable-fbdev-compositor --disable-libunwind"
-#    build wayland weston "--disable-setuid-install --disable-xwayland --enable-drm-compositor --enable-fbdev-compositor --disable-libunwind"
+    export WESTON_NATIVE_BACKEND=fbdev-backend.so
+    #build wayland weston "--disable-weston-launch --disable-libunwind --disable-setuid-install --disable-xwayland --disable-drm-compositor --with-cairo-glesv2 --enable-simple-egl-clients --enable-fbdev-compositor"
+    build wayland weston "--disable-libunwind --disable-setuid-install --disable-xwayland --disable-drm-compositor --with-cairo-glesv2 --enable-simple-egl-clients --enable-fbdev-compositor"
+    #build wayland weston "--disable-libunwind --disable-setuid-install --disable-xwayland --enable-drm-compositor --with-cairo-glesv2 --enable-simple-egl-clients --enable-fbdev-compositor"
 }
 
-build_driver_input() {
-    :
-}
-
-build_driver_video() {
-    :
-}
-
-# The server must be built before the drivers
-build_driver() {
-    # XQuartz doesn't need these...
-    case $HOST_OS in
-        Darwin) return 0 ;;
-    esac
-
-    build_driver_input
-    build_driver_video
-}
-
-# All fonts require mkfontscale and mkfontdir to be available
-#
-# The following fonts require bdftopcf to be available:
-#   adobe-100dpi, adobe-75dpi, adobe-utopia-100dpi, adobe-utopia-75dpi,
-#   arabic-misc, bh-100dpi, bh-75dpi, bh-lucidatypewriter-100dpi,
-#   bh-lucidatypewriter-75dpi, bitstream-100dpi, bitstream-75dpi,
-#   cronyx-cyrillic, cursor-misc, daewoo-misc, dec-misc, isas-misc,
-#   jis-misc, micro-misc, misc-cyrillic, misc-misc, mutt-misc,
-#   schumacher-misc, screen-cyrillic, sony-misc, sun-misc and
-#   winitzki-cyrillic
-#
-# The font util component must be built before any of the fonts, since they
-# use the fontutil.m4 installed by it.   (As do several other modules, such
-# as libfontenc and app/xfs, which is why it is moved up to the top.)
-#
-# The alias component is recommended to be installed after the other fonts
-# since the fonts.alias files reference specific fonts installed from the
-# other font components
-build_font() {
-    :
-}
-
-# makedepend requires xproto
 build_util() {
-    :
-    #build util gccmakedep
-
-    #build xkeyboard-config ""
+    build xkeyboard-config "" "--disable-nls"
 }
 
 # xorg-docs requires xorg-sgml-doctools
 build_doc() {
     build doc wayland-docs
+}
+
+build_efl() {
+    local GITROOT="git://git.enlightenment.org"
+    build core efl "--disable-physics --disable-libmount --with-x11=none --disable-ecore-con --disable-curl --with-glib=no --with-crypto=none --disable-fribidi --with-tests=none --enable-wayland --enable-egl --with-opengl=es --disable-image-loader-tiff --disable-image-loader-gif --disable-gstreamer --disable-audio --disable-pulseaudio"
+}
+
+build_elementary() {
+    local GITROOT="git://git.enlightenment.org"
+
+    build core elementary
+}
+
+build_e() {
+    local GITROOT="git://git.enlightenment.org"
+    build core enlightenment "--enable-wayland-clients --enable-wayland-egl --disable-physics"
+}
+
+build_freetype2() {
+    local GITROOT="git://git.sv.nongnu.org"
+    MAKEFLAGS="DESTDIR="
+    build freetype freetype2
+}
+
+build_fontconfig() {
+    local GITROOT="git://anongit.freedesktop.org"
+    build fontconfig
 }
 
 # just process the sub-projects supplied in the given file ($MODFILE)
@@ -762,73 +815,39 @@ build_doc() {
 process_module_file() {
     # preconds
     if [ X"$MODFILE" = X ]; then
-    echo "internal process_module_file() error, \$MODFILE is empty"
-    return 1
+        echo "internal process_module_file() error, \$MODFILE is empty"
+        return 1
     fi
     if [ ! -r "$MODFILE" ]; then
-    echo "module file '$MODFILE' is not readable or does not exist"
-    return 1
+        echo "module file '$MODFILE' is not readable or does not exist"
+        return 1
     fi
 
     # read from input file, skipping blank and comment lines
     while read line; do
-    # skip blank lines
-    if [ X"$line" = X ]; then
-        continue
-    fi
+        # skip blank lines
+        if [ X"$line" = X ]; then
+            continue
+        fi
 
-    # skip comment lines
-    echo "$line" | grep "^#" > /dev/null
-    if [ $? -eq 0 ]; then
-        continue
-    fi
+        # skip comment lines
+        echo "$line" | grep "^#" > /dev/null
+        if [ $? -eq 0 ]; then
+            continue
+        fi
 
-    module=`echo $line | cut -d' ' -f1 | cut -d'/' -f1`
-    component=`echo $line | cut -d' ' -f1 | cut -d'/' -f2`
-    confopts_check=`echo $line | cut -d' ' -f2-`
-    if [ "$module/$component" = "$confopts_check" ]; then
-        confopts=""
-    else
-        confopts="$confopts_check"
-    fi
-    build $module "$component" "$confopts"
+        module=`echo $line | cut -d' ' -f1 | cut -d'/' -f1`
+        component=`echo $line | cut -d' ' -f1 | cut -d'/' -f2`
+        confopts_check=`echo $line | cut -d' ' -f2-`
+        if [ "$module/$component" = "$confopts_check" ]; then
+            confopts=""
+        else
+            confopts="$confopts_check"
+        fi
+        build $module "$component" "$confopts"
     done <"$MODFILE"
 
     return 0
-}
-
-usage() {
-    basename="`expr "//$0" : '.*/\([^/]*\)'`"
-    echo "Usage: $basename [options] [prefix]"
-    echo "Options:"
-    echo "  -a          Do NOT run auto config tools (autogen.sh, configure)"
-    echo "  -b          Use .build.unknown build directory"
-    echo "  -c          Run make clean in addition to \"all install\""
-    echo "  -D          Run make dist in addition to \"all install\""
-    echo "  -d          Run make distcheck in addition \"all install\""
-    echo "  -g          Compile and link with debug information"
-    echo "  -h, --help  Display this help and exit successfully"
-    echo "  -n          Do not quit after error; just print error message"
-    echo "  -o <module/component>"
-    echo "              Build just this <module/component>"
-    echo "  -p          Update source code before building (git pull --rebase)"
-    echo "  -s <sudo>   The command name providing superuser privilege"
-    echo "  --autoresume <file>"
-    echo "              Append module being built to, and autoresume from, <file>"
-    echo "  --check     Run make check in addition \"all install\""
-    echo "  --clone     Clone non-existing repositories (uses \$GITROOT if set)"
-    echo "  --cmd <cmd> Execute arbitrary git, gmake, or make command <cmd>"
-    echo "  --confflags <options>"
-    echo "              Pass <options> to autgen.sh/configure of all modules"
-    echo "  --modfile <file>"
-    echo "              Only process the module/components specified in <file>"
-    echo "              Any text after, and on the same line as, the module/component"
-    echo "              is assumed to be configuration options for the configuration"
-    echo "              of each module/component specifically"
-    echo "  --retry-v1  Remake 'all' on failure with Automake silent rules disabled"
-    echo "  -L          Just list modules to build"
-    echo ""
-    envoptions
 }
 
 # Ensure the named variable value contains a full path name
@@ -841,10 +860,10 @@ check_full_path () {
     path=$1
     varname=$2
     if [ X"`expr $path : "\(.\)"`" != X/ ]; then
-    echo "The path \"$path\" supplied by \"$varname\" must be a full path name"
-    echo ""
-    usage
-    exit 1
+        echo "The path \"$path\" supplied by \"$varname\" must be a full path name"
+        echo ""
+        usage
+        exit 1
     fi
 }
 
@@ -858,12 +877,12 @@ check_writable_dir () {
     path=$1
     varname=$2
     if [ X"$SUDO" = X ]; then
-    if [ ! -d "$path" ] || [ ! -w "$path" ]; then
-        echo "The path \"$path\" supplied by \"$varname\" must be a writable directory"
-        echo ""
-        usage
-        exit 1
-    fi
+        if [ ! -d "$path" ] || [ ! -w "$path" ]; then
+            echo "The path \"$path\" supplied by \"$varname\" must be a writable directory"
+            echo ""
+            usage
+            exit 1
+        fi
     fi
 }
 
@@ -879,25 +898,25 @@ required_arg() {
     arg=$2
     # preconds
     if [ X"$option" = X ]; then
-    echo "internal required_arg() error, missing first argument"
-    exit 1
+        echo "internal required_arg() error, missing first argument"
+        exit 1
     fi
 
     # check for an argument
     if [ X"$arg" = X ]; then
-    echo "the '$option' option is missing its required argument"
-    echo ""
-    usage
-    exit 1
+        echo "the '$option' option is missing its required argument"
+        echo ""
+        usage
+        exit 1
     fi
 
     # does the argument look like an option?
     echo $arg | grep "^-" > /dev/null
     if [ $? -eq 0 ]; then
-    echo "the argument '$arg' of option '$option' looks like an option itself"
-    echo ""
-    usage
-    exit 1
+        echo "the argument '$arg' of option '$option' looks like an option itself"
+        echo ""
+        usage
+        exit 1
     fi
 }
 
@@ -927,140 +946,150 @@ while [ $# != 0 ]
 do
     case $1 in
     -a)
-    NOAUTOGEN=1
+        NOAUTOGEN=1
     ;;
     -b)
-    DIR_ARCH=".build.$HAVE_ARCH"
-    DIR_CONFIG=".."
+        DIR_ARCH=".build.$HAVE_ARCH"
+        DIR_CONFIG=".."
     ;;
     -c)
-    CLEAN=1
+        CLEAN=1
     ;;
     -D)
-    DIST=1
+        DIST=1
     ;;
     -d)
-    DISTCHECK=1
+        DISTCHECK=1
     ;;
     -g)
-    CFLAGS="${CFLAGS} -g3 -O0"
+        CFLAGS="${CFLAGS} -g3 -O0"
     ;;
     -h|--help)
-    usage
-    exit 0
+        usage
+        exit 0
     ;;
     -L)
-    LISTONLY=1
+        LISTONLY=1
     ;;
     -n)
-    NOQUIT=1
+        NOQUIT=1
     ;;
     -o)
-    if [ -n "$BUILT_MODULES_FILE" ]; then
-        echo "The '-o' and '--autoresume' options are mutually exclusive."
-        usage
-        exit 1
-    fi
-    required_arg $1 $2
-    shift
-    RESUME=$1
-    BUILD_ONE=1
+        if [ -n "$BUILT_MODULES_FILE" ]; then
+            echo "The '-o' and '--autoresume' options are mutually exclusive."
+            usage
+            exit 1
+        fi
+        required_arg $1 $2
+        shift
+        RESUME=$1
+        BUILD_ONE=1
     ;;
-    -p)
-    PULL=1
+    -P|--pull)
+        PULL=1
+    ;;
+    -r|--resume)
+        required_arg $1 $2
+        shift
+        RESUME=$1
     ;;
     -s)
-    required_arg $1 $2
-    shift
-    SUDO=$1
+        required_arg $1 $2
+        shift
+        SUDO=$1
     ;;
-    --autoresume)
-    if [ -n "$BUILD_ONE" ]; then
-        echo "The '-o' and '--autoresume' options are mutually exclusive."
-        usage
-        exit 1
-    fi
-    required_arg $1 $2
-    shift
-    BUILT_MODULES_FILE=$1
+        --autoresume)
+        if [ -n "$BUILD_ONE" ]; then
+            echo "The '-o' and '--autoresume' options are mutually exclusive."
+            usage
+            exit 1
+        fi
+        required_arg $1 $2
+        shift
+        BUILT_MODULES_FILE=$1
     ;;
     --check)
-    CHECK=1
+        CHECK=1
     ;;
-    --clone)
-    CLONE=1
+    -C|--clone)
+        CLONE=1
     ;;
     --run)
-    RUN_WESTON=1
+        RUN_WESTON=1
+    ;;
+    --args)
+        required_arg $1 $2
+        shift
+        RUN_ARGUMENTS=$1
     ;;
     --cmd)
-    required_arg $1 $2
-    shift
-    cmd1=`echo $1 | cut -d' ' -f1`
-    cmd2=`echo $1 | cut -d' ' -f2`
+        required_arg $1 $2
+        shift
+        cmd1=`echo $1 | cut -d' ' -f1`
+        cmd2=`echo $1 | cut -d' ' -f2`
 
-    # verify the command exists
-    which $cmd1 > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
-        echo "The specified command '$cmd1' does not appear to exist"
-        echo ""
-        usage
-        exit 1
-    fi
+        # verify the command exists
+        which $cmd1 > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echo "The specified command '$cmd1' does not appear to exist"
+            echo ""
+            usage
+            exit 1
+        fi
 
-    case X"$cmd1" in
-        X"git")
-        GITCMD=$1
-        ;;
-        X"make" | X"gmake")
-        MAKECMD=$cmd2
-        ;;
-        *)
-        echo "The script can only process 'make', 'gmake', or 'git' commands"
-        echo "It can't process '$cmd1' commands"
-        echo ""
-        usage
-        exit 1
-        ;;
-    esac
+        case X"$cmd1" in
+            X"git")
+            GITCMD=$1
+            ;;
+            X"make" | X"gmake")
+            MAKECMD=$cmd2
+            ;;
+            *)
+            echo "The script can only process 'make', 'gmake', or 'git' commands"
+            echo "It can't process '$cmd1' commands"
+            echo ""
+            usage
+            exit 1
+            ;;
+        esac
     ;;
     --confflags)
-    shift
-    CONFFLAGS=$1
+        shift
+        CONFFLAGS=$1
     ;;
     --modfile)
-    required_arg $1 $2
-    shift
-    if [ ! -r "$1" ]; then
-        echo "can't find/read file '$1'"
-        exit 1
-    fi
-    MODFILE=$1
+        required_arg $1 $2
+        shift
+        if [ ! -r "$1" ]; then
+            echo "can't find/read file '$1'"
+            exit 1
+        fi
+        MODFILE=$1
     ;;
     --retry-v1)
-    RETRY_VERBOSE=1
+        RETRY_VERBOSE=1
     ;;
     *)
-    if [ X"$too_many" = Xyes ]; then
-        echo "unrecognized and/or too many command-line arguments"
-        echo "  PREFIX:               $PREFIX"
-        echo "  Extra arguments:      $1"
-        echo ""
-        usage
-        exit 1
-    fi
+        if [ X"$too_many" = Xyes ]; then
+            echo "unrecognized and/or too many command-line arguments"
+            echo "  PREFIX:               $PREFIX"
+            echo "  Extra arguments:      $1"
+            echo ""
+            usage
+            exit 1
+        fi
 
-    # check that 'prefix' doesn't look like an option
-    echo $1 | grep "^-" > /dev/null
-    if [ $? -eq 0 ]; then
-        echo "'prefix' appears to be an option"
-        echo ""
-        usage
-        exit 1
-    fi
+        # check that 'prefix' doesn't look like an option
+        echo $1 | grep "^-" > /dev/null
+        if [ $? -eq 0 ]; then
+            echo "'prefix' appears to be an option"
+            echo ""
+            usage
+            exit 1
+        fi
 
-    PREFIX=$1
-    too_many=yes
+        PREFIX=$1
+        too_many=yes
     ;;
     esac
 
@@ -1070,26 +1099,37 @@ done
 if [ X"$RUN_WESTON" != X ]; then
     echo "Run weston"
     setup_buildenv
+    export HYBRIS_EGLPLATFORM=fbdev
     export MESA_DEBUG=1
     export WAYLAND_DEBUG=1
     export LIBGL_DEBUG=verbose
     export EGL_LOG_LEVEL=debug
+    export HYBRIS_LOGGING_LEVEL=debug
     export XDG_RUNTIME_DIR=${HOME}/xdg_wayland
-    sudo rm -rf $XDG_RUNTIME_DIR
-    mkdir $XDG_RUNTIME_DIR
-    chmod 0700 $XDG_RUNTIME_DIR
-    sudo chown $USER  $XDG_RUNTIME_DIR
-    cp wayland/weston/weston.ini ~/.config/
-    if [ "" = "$(groups | grep weston-launch)" ] ; then sudo groupadd weston-launch ; fi
-    sudo usermod -a -G weston-launch $USER
-    sudo chown root ${PREFIX}/bin/weston-launch
-    sudo chmod +s ${PREFIX}/bin/weston-launch
-    if [ "" = "$(grep XDG_RUNTIME_DIR /etc/environment)" ] ; then
-        sudo sh -c "echo XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR} >> /etc/environment"
+    if [ ! -d "$XDG_RUNTIME_DIR" ]; then
+        mkdir $XDG_RUNTIME_DIR
+        echo "created: $XDG_RUNTIME_DIR"
     fi
-    sudo -E ${PREFIX}/bin/weston -Bfbdev-backend.so
-    #sudo -E gdb ${PREFIX}/bin/weston
-    #sudo -E ${PREFIX}/bin/weston-launch -- -Bfbdev-backend.so
+    chmod 0700 $XDG_RUNTIME_DIR
+    $SUDO chown $USER  $XDG_RUNTIME_DIR
+    if [ ! -f $XDG_RUNTIME_DIR/weston.ini ]; then
+        cp wayland/weston/weston.ini $XDG_RUNTIME_DIR
+    fi
+    if [ "" = "$(groups | grep weston-launch)" ] ; then
+        $SUDO groupadd weston-launch
+        echo "group-added: weston-launch"
+    fi
+    $SUDO usermod -a -G weston-launch $USER
+    $SUDO chown root ${PREFIX}/bin/weston-launch
+    $SUDO chmod +s ${PREFIX}/bin/weston-launch
+    if [ "" = "$(grep XDG_RUNTIME_DIR /etc/environment)" ] ; then
+        $SUDO sh -c "echo XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR} >> /etc/environment"
+        echo "added \$XDG_RUNTIME_DIR to /etc/environment"
+    fi
+    #$SUDO gdb --args ${PREFIX}/bin/weston -Bfbdev-backend.so $RUN_ARGUMENTS
+    #$SUDO ${PREFIX}/bin/weston -Bdrm-backend.so $RUN_ARGUMENTS
+    $SUDO ${PREFIX}/bin/weston-launch -- -Bdrm-backend.so
+    #$SUDO ${PREFIX}/bin/weston-launch  -- --use-gl 2>&1 | tee log
     exit 0
 fi
 
@@ -1117,9 +1157,9 @@ if [ X"$BUILT_MODULES_FILE" != X -a -r "$BUILT_MODULES_FILE" ]; then
         component=`echo $line | cut -d' ' -f1 | cut -d'/' -f2`
         confopts_check=`echo $line | cut -d' ' -f2-`
         if [ "$module/$component" = "$confopts_check" ]; then
-        confopts=""
+            confopts=""
         else
-        confopts="$confopts_check"
+            confopts="$confopts_check"
         fi
 
         build_ret=""
@@ -1176,23 +1216,30 @@ if [ X"$MODFILE" = X ]; then
     # We must install the global macros before anything else
     build util macros
     build font util
-
-    build_doc
+    #build_doc
     build_proto
-    # Required by mesa and depends on xproto
-    build util makedepend
     build_lib
-    build cairo "" "--enable-glesv2=yes  --enable-egl=yes"
+    build pixman ""
     build_wayland
-    build_mesa
+    build_gl
+    build cairo "" "--enable-glesv2=yes  --enable-egl=yes"
+    build simple-yuv "" "--enable-intel-drm=yes --enable-gralloc=no"
     build_weston
-
-    build data bitmaps
-    build_app
-    build_driver
-    build_data
-    build_font
     build_util
+    # E18 specific GWIP
+    #build_freetype2
+    build_fontconfig
+    build dbus dbus
+    build_efl
+    build_elementary
+    build xcb util-keysyms
+    build_e
+
+    #build data bitmaps
+    #build_app
+    #build_driver
+    #build_data
+    #build_font
 else
     process_module_file
 fi
@@ -1214,7 +1261,7 @@ if [ X"$nonexistent_components" != X ]; then
     for mod in $nonexistent_components; do
     echo "    $mod"
     done
-    echo "You may want to provide the --clone option to wbuild.sh"
+    echo "You may want to provide the -C|--clone option to wbuild.sh"
     echo "to automatically git-clone the missing components"
     echo ""
 fi
