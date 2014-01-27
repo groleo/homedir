@@ -2,7 +2,7 @@
 #personal
 function EXT_COLOR () { echo -ne "\[\033[38;5;$1m\]"; }
 
-. /etc/bash_completion.d/git
+. /etc/bash_completion.d/git-prompt
 
 local_bin=${HOME}/.local/bin
 [ -f ${local_bin}/autojump.bash ] && source ${local_bin}/autojump.bash
