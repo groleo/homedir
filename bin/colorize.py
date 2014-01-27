@@ -46,7 +46,7 @@ if len(sys.argv)==1:
 					sys.stderr.flush()
 elif sys.stdin.isatty():
 	p = subprocess.Popen(sys.argv[1:],
-			buffsize=1,
+			bufsize=1,
 			close_fds=True,
 			stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE,
