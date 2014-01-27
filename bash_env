@@ -1,0 +1,46 @@
+#! /bin/bash
+#personal
+function EXT_COLOR () { echo -ne "\[\033[38;5;$1m\]"; }
+
+. /etc/bash_completion.d/git
+
+local_bin=${HOME}/.local/bin
+[ -f ${local_bin}/autojump.bash ] && source ${local_bin}/autojump.bash
+
+export EDITOR=/usr/bin/vim
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWSTASHSTATE=1
+export GIT_PS1_SHOWUNTRACKEDFILES=1
+
+export PS1='------------------------------------------------------------------\n\[\033[01;32m\]\u@\h\[\033[01;31m\]$(__git_ps1 " (%s)")$(basename "$ANDROID_PRODUCT_OUT") \[\033[01;33m\]\W \$\[\033[00m\] '
+
+#http://linux-sxs.org/housekeeping/lscolors.html
+export LS_COLORS='di=01;96:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
+
+# Android related
+export LANG=C
+export LC_ALL=C
+
+# Android related
+export GIT_PROXY_COMMAND=${local_bin}/socks-gw
+export JAVA_FONTS=/usr/share/fonts/truetype
+export CLASSPATH=.
+
+JAVA_BIN=/opt/java/jdk1.6.0_23/bin
+ANT_BIN=/usr/share/ant/bin
+
+ANDROID_SDK_DIR=${HOME}/.local/opt/android-sdk-linux/platform-tools
+export PATH=${HOME}/.local/bin:$JAVA_BIN:$ANT_BIN:$ANDROID_SDK_DIR:$PATH
+
+shgrep()
+{
+	find . -type f \( -name "Kconfig" -o -name '*.sh' -o -name '*.mk' -o -iname 'makefile*' -a ! -name '*.orig' \) -print0 | xargs -0 grep --color -n $*
+}
+
+
+alias grep="grep --color=auto --exclude='*.orig' --exclude='tags' --exclude-dir='.hg' --exclude-dir='.git' --exclude-dir='out' --exclude-dir='.svn'"
+alias cmm='mm 2>&1|ack --flush --passthru --color --color-match=red "^.*: error.*"|ack --flush --passthru --color --color-match=yellow "^.*g++ .*"|ack --flush --passthru --color --color-match=red ".*No rule to make target.*"'
+alias cd-="cd -"
+alias ls='ls --color=auto'
+
+synclient TapButton1=1

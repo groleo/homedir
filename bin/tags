@@ -1,0 +1,2 @@
+#! /bin/sh
+ctags -a -n --fields=+aikKlmnsSz --fields=-f --extra=+q --c-kinds=+cdefgmnpstuvx --c++-kinds=+cdefgmnpstuvx --if0=yes  --recurse=yes --file-scope=yes $@

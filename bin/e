@@ -1,0 +1,11 @@
+#! /bin/bash
+
+IFS=':' read FILE LINE JUNK <<<"$1"
+
+[ -n "$LINE" ] && LINE="+$LINE"
+AFILE=$FILE
+if [ ! -e "$FILE" ]; then
+	AFILE=`find . -name "$(basename $FILE)"`
+	[ "$AFILE" = "" ] && echo "No file: $FILE" && exit 1
+fi
+vim $AFILE $LINE
