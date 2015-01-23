@@ -462,6 +462,7 @@ int proxy_auth_type = PROXY_AUTH_NONE;
 #else /* !_WIN32 */
 #define closesocket close
 #define socket_errno() (errno)
+#define socket_errno_str() (strerror(errno))
 #endif /* !_WIN32 */
 
 #ifdef _WIN32
@@ -1764,7 +1765,7 @@ atomic_out( SOCKET s, char *buf, int size )
     while ( 0 < size ) {
         len = send( s, buf+ret, size, 0 );
         if ( len == -1 )
-            fatal("atomic_out() failed to send(), %d\n", socket_errno());
+            fatal("atomic_out() failed to send(), %s\n", socket_errno_str());
         ret += len;
         size -= len;
     }
@@ -1791,7 +1792,7 @@ atomic_in( SOCKET s, char *buf, int size )
     while ( 0 < size ) {
         len = recv( s, buf+ret, size, 0 );
         if ( len == -1 ) {
-            fatal("atomic_in() failed to recv(), %d\n", socket_errno());
+            fatal("atomic_in() failed to recv(), %s\n", socket_errno_str());
         } else if ( len == 0 ) {
             fatal( "Connection closed by peer.\n");
         }
@@ -2223,7 +2224,7 @@ sendf(SOCKET s, const char *fmt,...)
 
     report_text(">>>", buf);
     if ( send(s, buf, strlen(buf), 0) == SOCKET_ERROR ) {
-        debug("failed to send http request. errno=%d\n", socket_errno());
+        debug("failed to send http request. errno=%s\n", socket_errno_str());
         return -1;
     }
     return 0;
@@ -2571,7 +2572,7 @@ do_repeater( SOCKET local_in, SOCKET local_out, SOCKET remote )
 
         if ( select( nfds, &ifds, &ofds, (fd_set*)NULL, tmo ) == -1 ) {
             /* some error */
-            error( "select() failed, %d\n", socket_errno());
+            error( "select() failed, %s\n", socket_errno_str());
             return REASON_ERROR;
         }
 #ifdef _WIN32
@@ -2593,7 +2594,7 @@ do_repeater( SOCKET local_in, SOCKET local_out, SOCKET remote )
             } else if ( len == -1 ) {
                 if (socket_errno() != ECONNRESET) {
                     /* error */
-                    fatal("recv() faield, %d\n", socket_errno());
+                    fatal("recv() faield, %s\n", socket_errno_str());
                 } else {
                     debug("ECONNRESET detected\n");
                 }
@@ -2639,7 +2640,7 @@ do_repeater( SOCKET local_in, SOCKET local_out, SOCKET remote )
             if ( 1 < f_debug )          /* more verbose */
                 report_bytes( ">>>", lbuf, lbuf_len);
             if ( len == -1 ) {
-                fatal("send() failed, %d\n", socket_errno());
+                fatal("send() failed, %s\n", socket_errno_str());
             } else if ( 0 < len ) {
                 /* move data on to top of buffer */
                 debug("send %d bytes\n", len);
@@ -2692,7 +2693,7 @@ accept_connection (u_short port)
     debug("Creating source port to forward.\n");
     sock = socket (PF_INET, SOCK_STREAM, 0);
     if (sock < 0)
-        fatal("socket() failed, errno=%d\n", socket_errno());
+        fatal("socket() failed, errno=%s\n", socket_errno_str());
     sockopt = 1;
     setsockopt (sock, SOL_SOCKET, SO_REUSEADDR,
                 (void*)&sockopt, sizeof(sockopt));
@@ -2702,10 +2703,10 @@ accept_connection (u_short port)
     name.sin_port = htons (port);
     name.sin_addr.s_addr = htonl (INADDR_ANY);
     if (bind (sock, (struct sockaddr *) &name, sizeof (name)) < 0)
-        fatal ("bind() failed, errno=%d\n", socket_errno());
+        fatal ("bind() failed, errno=%s\n", socket_errno_str());
 
     if (listen( sock, 1) < 0)
-        fatal ("listen() failed, errno=%d\n", socket_errno());
+        fatal ("listen() failed, errno=%s\n", socket_errno_str());
 
     /* wait for new connection with watching EOF of stdin. */
     debug ("waiting new connection at port %d (socket=%d)\n", port, sock);
@@ -2726,7 +2727,7 @@ accept_connection (u_short port)
 #endif
         n = select (nfds, &ifds, NULL, NULL, ptmo);
         if (n == -1) {
-            fatal ("select() failed, %d\n", socket_errno());
+            fatal ("select() failed, %s\n", socket_errno_str());
             exit (1);
         }
 #ifdef _WIN32
@@ -2748,7 +2749,7 @@ accept_connection (u_short port)
     socklen = sizeof(client);
     connection = accept( sock, &client, &socklen);
     if ( connection < 0 )
-        fatal ("accept() failed, errno=%d\n", socket_errno());
+        fatal ("accept() failed, errno=%s\n", socket_errno_str());
     return connection;
 }
 
@@ -2797,13 +2798,13 @@ retry:
     if ( relay_method == METHOD_DIRECT ) {
         remote = open_connection (dest_host, dest_port);
         if ( remote == SOCKET_ERROR )
-            fatal( "Unable to connect to destination host, errno=%d\n",
-                   socket_errno());
+            fatal( "Unable to connect to destination host, errno=%s\n",
+                   socket_errno_str());
     } else {
         remote = open_connection (relay_host, relay_port);
         if ( remote == SOCKET_ERROR )
-            fatal( "Unable to connect to relay host, errno=%d\n",
-                   socket_errno());
+            fatal( "Unable to connect to relay host, errno=%s\n",
+                   socket_errno_str());
     }
 
     /** resolve destination host (SOCKS) **/
