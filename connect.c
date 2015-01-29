@@ -2035,7 +2035,8 @@ begin_socks5_relay( SOCKET s )
 {
     char buf[256], *ptr, *env = socks5_auth;
     unsigned int n_auth = 0;
-    char auth_list[10], auth_method;
+    char auth_list[10];
+    unsigned char auth_method;
     int len, auth_result, i;
 
     debug( "begin_socks_relay()\n");
