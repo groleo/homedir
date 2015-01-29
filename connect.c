@@ -542,7 +542,7 @@ char *
 expand_host_and_port (const char *fmt, const char *host, int port)
 {
     const char *src;
-    char *buf, *dst, *ptr;
+    char *buf, *dst;
     size_t len = strlen(fmt) + strlen(host) + 20;
     buf = xmalloc (len);
     dst = buf;
@@ -1913,7 +1913,7 @@ readpass( const char* prompt, ...)
 static int
 socks5_do_auth_userpass( int s )
 {
-    unsigned char buf[1024], *ptr;
+    char buf[1024], *ptr;
     char *pass = NULL;
     int len;
 
@@ -2006,7 +2006,7 @@ socks5_auth_parse_1(char *start, char *end){
 }
 
 int
-socks5_auth_parse(char *start, unsigned char *auth_list, int max_auth){
+socks5_auth_parse(char *start, char *auth_list, int max_auth){
     char *end;
     int i = 0;
     while ( i < max_auth ) {
@@ -2033,8 +2033,9 @@ socks5_auth_parse(char *start, unsigned char *auth_list, int max_auth){
 int
 begin_socks5_relay( SOCKET s )
 {
-    unsigned char buf[256], *ptr, *env = socks5_auth;
-    unsigned char n_auth = 0; unsigned char auth_list[10], auth_method;
+    char buf[256], *ptr, *env = socks5_auth;
+    unsigned int n_auth = 0;
+    char auth_list[10], auth_method;
     int len, auth_result, i;
 
     debug( "begin_socks_relay()\n");
@@ -2168,7 +2169,7 @@ begin_socks5_relay( SOCKET s )
 int
 begin_socks4_relay( SOCKET s )
 {
-    unsigned char buf[256], *ptr;
+    char buf[256], *ptr;
 
     debug( "begin_socks_relay()\n");
 
@@ -2238,7 +2239,7 @@ make_base64_string(const char *str)
 {
     static char *buf;
     unsigned char *src;
-    char *dst;
+    unsigned char *dst;
     int bits, data, src_len, dst_len;
     /* make base64 string */
     src_len = strlen(str);
