@@ -2679,15 +2679,10 @@ do_repeater( SOCKET local_in, SOCKET local_out, SOCKET remote )
 }
 
 int
-accept_connection (u_short port)
+bind_and_listen(u_short port)
 {
-    static int sock = -1;
-    int connection;
+    int sock = -1;
     struct sockaddr_in name;
-    struct sockaddr client;
-    int socklen;
-    fd_set ifds;
-    int nfds;
     int sockopt;
 
     /* Create the socket. */
@@ -2709,8 +2704,20 @@ accept_connection (u_short port)
     if (listen( sock, 1) < 0)
         fatal ("listen() failed, errno=%s\n", socket_errno_str());
 
+    return sock;
+}
+
+int
+accept_connection (int sock)
+{
+    int nfds;
+    fd_set ifds;
+    socklen_t socklen;
+    struct sockaddr client;
+    int connection;
+
     /* wait for new connection with watching EOF of stdin. */
-    debug ("waiting new connection at port %d (socket=%d)\n", port, sock);
+    debug ("waiting new connection (socket=%d)\n", sock);
     nfds = sock + 1;
     do {
         int n;
@@ -2762,6 +2769,7 @@ main( int argc, char **argv )
 {
     int ret;
     int remote;                                 /* socket */
+    int listen_s;
     int local_in;                               /* Local input */
     int local_out;                              /* Local output */
     int reason;
@@ -2778,7 +2786,8 @@ main( int argc, char **argv )
     /* Open local_in and local_out if forwarding a port */
     if ( local_type == LOCAL_SOCKET ) {
         /* Relay between local port and destination */
-        local_in = local_out = accept_connection( local_port );
+        listen_s = bind_and_listen(local_port);
+        local_in = local_out = accept_connection( listen_s );
     } else {
         /* Relay between stdin/stdout and desteination */
         local_in = 0;
@@ -2863,7 +2872,8 @@ do_repeater:
         f_hold_session) {
         /* re-wait at local port without closing remote session */
         debug ("re-waiting at local port %d\n", local_port);
-        local_in = local_out = accept_connection( local_port );
+        //local_in = local_out = accept_connection( local_port );
+        local_in = local_out = accept_connection( listen_s );
         debug ("re-start relaying\n");
         goto do_repeater;
     }
