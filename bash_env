@@ -1,46 +1,139 @@
 #! /bin/bash
 #personal
+HISTCONTROL="ignoredups:erasedups"
+HISTSIZE=1048576
+HISTFILESIZE=1048576
+LAST_HISTORY_WRITE=$SECONDS
+prompt_command() {
+#	if [ $(($SECONDS - $LAST_HISTORY_WRITE)) -gt 60 ]; then
+		history -a && history -c && history -r
+#		LAST_HISTORY_WRITE=$SECONDS
+#	fi
+}
+
+PROMPT_COMMAND="prompt_command"
+export HISTCONTROL HISTSIZE HISTFILESIZE PROMPT_COMMAND
+shopt -s histappend
+
 function EXT_COLOR () { echo -ne "\[\033[38;5;$1m\]"; }
 
-. /etc/bash_completion.d/git
-
-local_bin=${HOME}/.local/bin
-[ -f ${local_bin}/autojump.bash ] && source ${local_bin}/autojump.bash
-
-export EDITOR=/usr/bin/vim
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
 
-export PS1='------------------------------------------------------------------\n\[\033[01;32m\]\u@\h\[\033[01;31m\]$(__git_ps1 " (%s)")$(basename "$ANDROID_PRODUCT_OUT") \[\033[01;33m\]\W \$\[\033[00m\] '
+[[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh
+_extra_git='X'
+if [ -f /etc/bash_completion.d/git-prompt ] ; then
+    source /etc/bash_completion.d/git-prompt
+    _extra_git='[$(__git_ps1 "%s")]'
+fi
+if [ -f /etc/bash_completion.d/git ]; then
+    source /etc/bash_completion.d/git
+    _extra_git='[$(__git_ps1 "%s")]'
+fi
 
-#http://linux-sxs.org/housekeeping/lscolors.html
-export LS_COLORS='di=01;96:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
-
-# Android related
-export LANG=C
-export LC_ALL=C
-
-# Android related
-export GIT_PROXY_COMMAND=${local_bin}/socks-gw
-export JAVA_FONTS=/usr/share/fonts/truetype
-export CLASSPATH=.
-
-JAVA_BIN=/opt/java/jdk1.6.0_23/bin
-ANT_BIN=/usr/share/ant/bin
-
-ANDROID_SDK_DIR=${HOME}/.local/opt/android-sdk-linux/platform-tools
-export PATH=${HOME}/.local/bin:$JAVA_BIN:$ANT_BIN:$ANDROID_SDK_DIR:$PATH
-
-shgrep()
-{
-	find . -type f \( -name "Kconfig" -o -name '*.sh' -o -name '*.mk' -o -iname 'makefile*' -a ! -name '*.orig' \) -print0 | xargs -0 grep --color -n $*
+__android_extra() {
+    if [ "$ANDROID_PRODUCT_OUT" != "" ]; then
+        echo -n "[$(basename $ANDROID_PRODUCT_OUT)]"
+    fi
 }
 
 
-alias grep="grep --color=auto --exclude='*.orig' --exclude='tags' --exclude-dir='.hg' --exclude-dir='.git' --exclude-dir='out' --exclude-dir='.svn'"
-alias cmm='mm 2>&1|ack --flush --passthru --color --color-match=red "^.*: error.*"|ack --flush --passthru --color --color-match=yellow "^.*g++ .*"|ack --flush --passthru --color --color-match=red ".*No rule to make target.*"'
-alias cd-="cd -"
-alias ls='ls --color=auto'
+sep="-------------------------------------------------------------------------------"
+export PS1='\[\033[01;33m\]'"${sep}"'\n\[\033[01;32m\]\u@\h\[\033[01;31m\]'$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$ '
+[ -n "$SCHROOT_CHROOT_NAME" ] && export PS1="${PS1}+ "
+#http://linux-sxs.org/housekeeping/lscolors.html
+#export LS_COLORS='di=01;96:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
+#export LS_COLORS="di=01;37"
+LS_COLORS="no=0;93:rs=0:di=01;37:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:"
+export EDITOR=/usr/bin/vim
+export VISUAL=/usr/bin/vim
 
-synclient TapButton1=1
+#export LC_ALL=C.UTF-8
+#export LANGUAGE=C.UTF-8
+#export LANG=C.UTF-8
+
+export PATH=/opt/intel/vtune_amplifier_xe/bin64/:.:/home/adrian/workspace/chromium/depot_tools:/home/adrian/.local/bin:/opt/java/jdk1.6.0_27/bin:/usr/share/ant/bin:/home/adrian/.local/opt/p4v-2014.1.827578/bin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+
+alias grep="grep --color=auto --exclude='*.orig' --exclude='tags' --exclude-dir='.hg' --exclude-dir='.git' --exclude-dir='out'"
+alias cgrep="grep --color=always --exclude='*.orig' --exclude='tags' --exclude-dir='.hg' --exclude-dir='.git' --exclude-dir='out'"
+alias cd-="cd -"
+alias l1='ls -1'
+alias tmux='tmux -2 -u'
+alias f=fg
+
+# Intel
+export http_proxy=http://proxy.jf.intel.com:911
+export ftp_proxy=ftp://proxy.jf.intel.com:911
+export all_proxy=socks://proxy.jf.intel.com:1080
+export ALL_PROXY=socks://proxy.jf.intel.com:1080
+export https_proxy=https://proxy.jf.intel.com:912
+export no_proxy=localhost,.intel.com,10.0.0.0/8
+export GIT_PROXY_COMMAND=${HOME}/.local/bin/socks-gw
+
+# Perforce
+export P4DIFF=diff
+export P4USER=amnegrea
+export P4CLIENT=amnegrea_amnegrea-git
+export P4PORT=ssl:p4proxy11.devtools.intel.com:2210
+
+# Android
+export LFSTK_BIN=/opt/lfstk.1.8.6/bin/lfstk
+export LFSTK_KEY_DIR=${HOME}/local/fstk-keys
+export CLASSPATH=.
+export JAVA_FONTS=/usr/share/fonts/truetype
+export JAVA_HOME=/opt/java/jdk1.6.0_27
+export ANT_HOME=/usr/share/ant
+
+shgrep() {
+	local d=${2:-.}
+	find $d -type f \( -name CMakeLists.txt -o -name "Kconfig" -o -name '*.sh' -o -name '*.mk' -o -iname 'makefile*' -a ! -name '*.orig' \) -print0 | xargs -0 grep --color -n "$@"
+}
+amkgrep() {
+	find . -type f \( -name 'Android*.mk' -a ! -name '*.orig' \) -print0 | xargs -0 grep --color -n "$@"
+}
+hgrep () {
+	    find . -name .repo -prune -o -name .git -prune -o -type f \(  -name '*.h' \) -print0 | xargs -0 grep --color -n "$@"
+}
+renew() {
+	find . -type f -exec touch {} \;
+}
+cmm() {
+	mm 2>&1 $* \
+	| ack --flush --passthru --color --color-match=red "^.*: error.*" \
+	| ack --flush --passthru --color --color-match=red "^.*: fatal error.*" \
+	| ack --flush --passthru --color --color-match=yellow "^.*: warning:.*" \
+	| ack --flush --passthru --color --color-match=red ".*undefined reference to*" \
+	| ack --flush --passthru --color --color-match=red ".*No rule to make target.*" \
+	| ack --flush --passthru --color --color-match=red ".*multiple definition of.*" | tee /tmp/log
+	RV=${PIPESTATUS[0]}
+
+	grep "Install:" /tmp/log > /tmp/install
+	sed -e 's/Install:/c push/' -i /tmp/install
+	mv /tmp/install .
+	chmod +x install
+	rm /tmp/log
+	return $RV
+}
+col() {
+	$* \
+	| ack --flush --passthru --color --color-match=red "^.*: error.*" \
+	| ack --flush --passthru --color --color-match=red "^.*: fatal error.*" \
+	| ack --flush --passthru --color --color-match=yellow "^.*: warning:.*" \
+	| ack --flush --passthru --color --color-match=red ".*undefined reference to*" \
+	| ack --flush --passthru --color --color-match=red ".*No rule to make target.*" \
+	| ack --flush --passthru --color --color-match=red ".*multiple definition of.*" | tee /tmp/log
+	return ${PIPESTATUS[0]}
+}
+
+#localhost:10.0
+export DISPLAY=:0
+
+set bell-style none
+#setterm -blength 0
+#export ADBHOST=10.237.104.13
+#XDG_CONFIG_DIRS="/etc/xdg:$HOME/.local/etc/xdg"
+#XDG_DATA_DIRS="$HOME/.local/share:/usr/share:/usr/local/share"
+#alias tar='tar --use-compress-program=pigz'
+
+bind -x '"\eOP":"fg"'

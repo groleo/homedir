@@ -2629,7 +2629,7 @@ do_repeater( SOCKET local_in, SOCKET local_out, SOCKET remote )
                     f_local = 0;
                     close_reason = REASON_CLOSED_BY_LOCAL;
                 } else
-                    fatal("recv() failed, errno = %d\n", errno);
+                    fatal("recv() failed, errno = %s\n", socket_errno_str());
             } else {
                 /* repeat */
                 lbuf_len += len;
@@ -2660,7 +2660,7 @@ do_repeater( SOCKET local_in, SOCKET local_out, SOCKET remote )
             else
                 len = write( local_out, rbuf, rbuf_len);
             if ( len == -1 ) {
-                fatal("output (local) failed, errno=%d\n", errno);
+                fatal("output (local) failed, errno=%s\n", socket_errno_str());
             }
             rbuf_len -= len;
             if ( len < rbuf_len )

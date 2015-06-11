@@ -21,24 +21,25 @@ if has('gui_running')
 endif
 
 set t_Co=256
+colorscheme groleo     "use my colorscheme
 set encoding=utf-8
 
-colorscheme groleo     "use my colorscheme
 syntax on               "turn ON syntax highlight
 filetype on             "enable filetype detection
-filetype plugin on      "TODO
+filetype indent plugin on      "TODO
 botright cwindow        "make quickfix-window always occupy the full width:
 
 
-"set ttymouse=xterm2     "Make vim work with 'tmux'
-set mouse-=a
-set mouse+=n
-set autoindent          "Copy indent from current line when starting a new line t
+set ttymouse=xterm2     "Make vim work with 'tmux'
+"set mouse-=a
+"set mouse+=n
+set mouse=a
+set autoindent          "Copy indent from current line when starting a new line
 set autowriteall        "buffers will be automatically written when abandoned
 set backspace=indent,eol,start  "backspace over everything, when in insert mode
 set comments=sl:/*,mb:*,elx:*/  "TODO
 "insert, ctrl-v u UTFCODE
-set fillchars=stl:^,stlnc:.,vert:\║
+set fillchars=stl:\█,stlnc:\═,vert:\║
 set hidden
 set hlsearch            "highlight search matches
 set ignorecase          "CaseSensytive OFF
@@ -73,6 +74,16 @@ set foldenable          "when off, all folds are open
 set foldmethod=marker
 set foldmarker={,}
 let mapleader = "\\"
+"set esckeys
+
+set tags=./tags;/
+autocmd FileType make set noexpandtab shiftwidth=8 " Use real tabs for Makefiles
+let g:Tlist_Process_File_Always=1
+let g:showmarks_enable=1
+"let g:vimwiki_list = [{'path': '~/Documents/vimwiki/', 'path_html': '~/public_html/vimwiki','auto_export': 1}]
+let g:vimwiki_list = [{"path": '~/Documents/vimwiki/', 'path_html': '~/public_html/vimwiki', 'syntax': 'markdown', 'ext': '.mkd', 'custom_wiki2html': '~/.local/bin/md2html.sh', 'auto_export': 1,"css_file": '~/public_html/vimwiki/pandoc.css'}]
+let &colorcolumn=join(range(81,999),",")
+highlight ColorColumn ctermbg=235 guibg=#2c2d27
 
 
 " Bindings
@@ -80,24 +91,29 @@ let mapleader = "\\"
 " Make shift-insert work like in Xterm
 map  <S-Insert> <MiddleMouse>
 map! <S-Insert> <MiddleMouse>
-map  <F2> :w<CR>
-map! <F2> <esc>:w<CR>a
-map  <F3> :
+map  <F1> :sus<CR>
+map! <F1> <esc>:sus<CR>a
+map  <F2> :w!<CR>
+map! <F2> <esc>:w!<CR>a
+map  <F3> f{V%
 map! <F3> <esc>:
 set pastetoggle=<F4>
 map  <F5> :call Make()<CR>
 map! <F5> <esc>:call Make()<CR>i
-map  [18~  :silent w !xclip<CR><CR>
-vmap [18~  "*y
 map  <F6> :cn<CR>
 map! <F6> <esc>:cn<CR>i
+
 map  <F7>  :silent w !xclip<CR><CR>
+map  [18~  :silent w !xclip<CR><CR>
 vmap <F7>  "*y
+vmap [18~  "*y
 "Copy to clipboard
 map <F8> "+y
 " Paste from clipboard
 map <S-F8> "+gP
-map!<S-F8> <esc>"+gPi
+map [32~ "+gP
+vmap <S-F8> <esc>"+gPi
+vmap [32~ <esc>"+gPi
 
 
 " Vimdiff bindings
@@ -149,7 +165,16 @@ inoremap <silent> [1;3A <C-O><C-W>W
 noremap <silent> [1;3A <C-W>k
 
 " Tabview
-inoremap <silent> <C-1> <C-O>:tabn 1<CR>a
+noremap <silent> <Leader>1 :tabn 1<CR>
+noremap <silent> <Leader>2 :tabn 2<CR>
+noremap <silent> <Leader>3 :tabn 3<CR>
+noremap <silent> <Leader>4 :tabn 4<CR>
+noremap <silent> <Leader>5 :tabn 5<CR>
+noremap <silent> <Leader>6 :tabn 6<CR>
+noremap <silent> <Leader>7 :tabn 7<CR>
+noremap <silent> <Leader>8 :tabn 8<CR>
+noremap <silent> <Leader>9 :tabn 9<CR>
+noremap <silent> <Leader>0 :tabn 10<CR>
 
 
 "inoremap <silent> OD <C-O>:tabprev<CR>a
@@ -167,28 +192,9 @@ map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 "A-] - Open the definition in a vertical split
 map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
 map <C-F12> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
-set tags=./tags;/
-"inoremap <Nul> <C-x><C-o>
 map - :Explore<cr>
 
 
-
-"------------------------------------
-" Highlight the 80th column so that you know
-if has('autocmd')
-   " Do not highlight the character if it is a:
-   "      <>[]{}()"':
-   " since that messes up the syntax highlighting for the file
-   let rightMargin = 'au FileType * syn clear rightMargin | ' .
-               \ 'syn match rightMargin /\%80' .
-               \ 'v[^<>(){}\[\]:/\"'."'".']/ containedin=ALL'
-   execute rightMargin
-   hi rightMargin ctermbg=Red guibg=Red
-   " Convienent command to clear it, if it messes up syntax
-   " highlighting, which it usually does on when the 80th column
-   " is a single or double quote
-   command! RightMarginClear syn clear rightMargin
-endif
 
 " Match redundant whitspaces
 highlight RedundantSpaces guibg=green ctermbg=green
@@ -203,35 +209,26 @@ match RedundantSpaces /\s\+$\| \+\ze\t/
 "autocmd BufAdd * exe 'tablast | tabe "' . expand( "<afile") .'"'
 autocmd BufReadPre *.pdf set ro
 autocmd BufReadPost *.pdf %!pdftotext -nopgbrk "%" -
+autocmd BufReadPost * :DetectIndent
+
 "autocmd BufWritePre *{.c,.cpp,.h,.hpp,.sh,.ini,Makefile}  call RemoveTrailingSpace() " Remove trailing spaces for C/C++ and Vim files
 
-autocmd FileType make set noexpandtab shiftwidth=8 " Use real tabs for Makefiles
-function! SyntaxItem()
-  return synIDattr(synID(line("."),col("."),1),"name")
-endfunction
-let g:Tlist_Process_File_Always=1
+"function! SyntaxItem()
+"  return synIDattr(synID(line("."),col("."),1),"name")
+"endfunction
 "set statusline=%1*%=\|%f\ %h%m%r\ %-5l,%-5c\ %P%1*
 "set statusline+=%{SyntaxItem()}
-
-
-
-
-
-let g:showmarks_enable=1
 "autocmd VimEnter * call ShowMarksOn()
-
 "set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 10
 "let Powerline_symbols = 'compatible'
 "let g:Powerline_symbols = 'fancy'
-
-
 "au BufRead,BufNewFile *.log set filetype=diver
 "au! Syntax diver source /home/mariusn/.vim/syntax/diver.vim
 
 " Set an orange cursor in Insert mode, and red cursor otherwise.
 " Works at least for xterm and rxvt terminals
 " Does not work at least for gnome terminal, konsole, xfce4-terminal
-"if &term =~ "xterm\\|rxvt"
+"if &term =~ "xterm\\|rxvt\\|screen"
 "  :silent !echo -ne "\033]12;red\007"
 "  let &t_SI = "\033]12;orange\007"
 "  let &t_EI = "\033]12;red\007"
@@ -281,7 +278,7 @@ inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 
 function! SetTab(width)
       "set noexpandtab
-      set noexpandtab           "use spaces instead of tabs
+      set expandtab           "use spaces instead of tabs
       "set softtabstop=a:width       "spaces to insert when <Tab> is pressed
       "Number of spaces that a <Tab> in the file counts for
        execute "set tabstop=".str2nr(a:width)
@@ -330,37 +327,47 @@ endfunction
 set tabline=%!MyTabLine()
 
 if has('statusline')
-  set statusline=%#Question#                   " set highlighting
-  set statusline+=%#StatusLineNC#              " set highlighting
-  set statusline+=%-2.2n\                    " buffer number
-  set statusline+=%#DiffDelete#
+  set statusline=
   set statusline+=%(%{Tlist_Get_Tagname_By_Line()}%)
-  set statusline+=%#StatusLineNC#              " set highlighting
-  set statusline+=\ \                          " set highlighting
-  set statusline+=%#WarningMsg#                " set highlighting
-  set statusline+=%f                         " file name
-  set statusline+=%#Question#                  " set highlighting
-  set statusline+=\ \                          " set highlighting
-  "set statusline+=%h                          " help
-  "set statusline+=%#Question#                  " set highlighting
-  "set statusline+=%r                       " read-only
-  "set statusline+=%w                       " read-only
-  "set statusline+=%{strlen(&ft)?&ft:'none'},   " file type
-  "set statusline+=%{(&fenc==\"\"?&enc:&fenc)}, " encoding
-  set statusline+=%{((exists(\"+bomb\")\ &&\ &bomb)?\"B,\":\"\")} " BOM
-  set statusline+=%{&fileformat},              " file format
-  "set statusline+=%{&spelllang},               " language of spelling checker
-  "set statusline+=%{SyntaxItem()}              " syntax highlight group under cursor
-  set statusline+=%=                           " ident to the right
+  set statusline+=%*
+  set statusline+=\ 
   set statusline+=%#DiffDelete#              " set highlighting
-  set statusline+=%m                       " modified
-  set statusline+=%#StatusLineNC#              " set highlighting
-  set statusline+=%#Question#                  " set highlighting
-  set statusline+=\ \                          " set highlighting
-  set statusline+=0x%-8B\                      " character code under cursor
-  set statusline+=%-7.(%l,%L,%c%V%)\ %<%P         " cursor position/offset
-  set statusline+=%14o                         " cursor position/offset
+  set statusline+=%m                         " modified
+  set statusline+=%*
+  set statusline+=%#WarningMsg#              " set highlighting
+  set statusline+=%t                         " file name tail
+  set statusline+=%#Question#                " set highlighting
+  set statusline+=\ 
+  set statusline+=%{((exists(\"+bomb\")\ &&\ &bomb)?\"B,\":\"\")} " BOM
+  set statusline+=%{&fileformat}             " file format
+  set statusline+=%*
+  set statusline+=\ 
+  set statusline+=0x%-8B\                    " character code under cursor
+  set statusline+=%-7.(%l:%c,%o%V%)\ %<%P    " cursor position/offset
 endif
 
-call SetTab(8)
-let g:vimwiki_list = [{'path': '~/Doc/vimwiki/', 'path_html': '~/public_html/vimwiki'}]
+
+function! TextEnableCodeSnip(filetype,start,end,textSnipHl) abort
+  let ft=toupper(a:filetype)
+  let group='textGroup'.ft
+  if exists('b:current_syntax')
+    let s:current_syntax=b:current_syntax
+    " Remove current syntax definition, as some syntax files (e.g. cpp.vim)
+    " do nothing if b:current_syntax is defined.
+    unlet b:current_syntax
+  endif
+  execute 'syntax include @'.group.' syntax/'.a:filetype.'.vim'
+  try
+    execute 'syntax include @'.group.' after/syntax/'.a:filetype.'.vim'
+  catch
+  endtry
+  if exists('s:current_syntax')
+    let b:current_syntax=s:current_syntax
+  else
+    unlet b:current_syntax
+  endif
+  execute 'syntax region textSnip'.ft.'
+  \ matchgroup='.a:textSnipHl.'
+  \ start="'.a:start.'" end="'.a:end.'"
+  \ contains=@'.group
+endfunction
