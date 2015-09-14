@@ -1,1 +1,83 @@
-some stuff
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+
+<head>
+	<meta charset="utf-8">
+ 	<meta http-equiv="X-UA-Compatible" content="IE=edge">	
+	<meta name="viewport" content="width=device-width">
+	<title>Morse Code Trainer</title>
+
+	<link rel="stylesheet" href="css/normalize.css">
+	<link rel="stylesheet" href="css/foundation.min.css">
+
+	<script src="js/vendor/custom.modernizr.js"></script>
+	<style type="text/css">
+		span.token.good {
+			color: blue;
+		}
+		span.token.bad {
+			color: red;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="row">
+		<div class="large-9 columns">
+			<form class="custom">
+	
+				<fieldset id="freeform">
+					<legend>Free-form</legend>
+					<div class="row">
+<textarea autofocus id="fmessage" rows="4" cols="50" name="comment" form="freeform" placeholder="Type your free-form text here"></textarea>
+</div>
+
+
+					<div class="row">
+						<div class="large-12 columns">
+							<a href="javascript: void(0);" class="button play">Play</a>
+							<a href="javascript: void(0);" class="button stop">Stop</a>
+						</div>
+					</div>
+
+				</fieldset>
+			</form>
+
+		</div>
+
+		<div class="large-3 columns">
+	      <fieldset>
+	        <legend>Sound Controls</legend>
+	        <label for="volume">Volume <span data-tooltip aria-haspopup="true" class="has-tip" title="Probably best to use your computer's volume control...">(?)</span></label>
+	        <input size="5" type="text" id="volume" value="0.5"/>
+	        <label for="pitch">Pitch / Hz <span data-tooltip aria-haspopup="true" class="has-tip" title="A high number makes a high pitch. 700 is a good value.">(?)</span></label>
+	        <input size="5" type="text" id="pitch" value="700"/>
+	        <label for="wpm">Speed (WPM or CPM=5*WPM) <span data-tooltip aria-haspopup="true" class="has-tip" title="The speed in words per minute, taking 'PARIS' as the standard word.">(?)</span></label>
+	        <input size="5" type="text" id="wpm" name="wpm" value="40" onBlur="javascript:tieSpeeds()"/>
+
+	        <label for="fwpm">Farnsworth Speed / wpm <span data-tooltip aria-haspopup="true" class="has-tip" title="The Farnsworth speed slows down the space between letters and words, making it easier to learn Morse. It should be a lower value than the speed.">(?)</span></label>
+	        <input size="5" type="text" id="fwpm" name="fwpm" value="40" onBlur="javascript:tieSpeeds()"/>
+	        <input type="checkbox" checked id="useprosigns" name="useprosigns"/>
+	        <label for="useprosigns">Use prosigns <span data-tooltip aria-haspopup="true" class="has-tip" title="Prosigns are a sort of Morse code shorthand, written e.g. < BT >">(?)</span></label>
+	      </fieldset>
+		</div>
+	</div>
+
+
+	<script src="js/vendor/jquery.js"></script>	
+	<script src="js/foundation/foundation.js"></script>
+	<script src="js/foundation/foundation.tooltip.js"></script>
+
+	<script>
+	$(document).foundation();
+	</script>
+
+	<script type="text/javascript" src="js/audio/resampler.js"></script>
+	<script type="text/javascript" src="js/audio/swfobject.js"></script>
+	<script type="text/javascript" src="js/audio/XAudioServer.js"></script>
+	<script type="text/javascript" src="js/morse.js"></script>
+	<script type="text/javascript" src="js/sessions2.js"></script>
+	<script type="text/javascript" src="js/trainer.js"></script>
+</body>
+</html>
