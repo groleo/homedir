@@ -32,20 +32,50 @@
 !XTerm*color13:         #ff55ff
 !XTerm*color14:         #55ffff
 !XTerm*color15:         #ffffff
+Xft.dpi:                    110
+Xft.antialias:              true
+Xft.rgba:                   rgb
+Xft.hinting:                true
+Xft.hintstyle:              hintslight
+
+!URxvt.intensityStyles:  false  
+!URxvt.perl-ext-common: ,tabbed,
+URxvt.scrollBar:    false
+! run fc-list  to get a list of xft fonts
+!URxvt*font:         xft:Terminus:pixelsize=18
+!URxvt*boldFont:     xft:Terminus:bold:pixelsize=18
+URxvt.font: xft:DejaVu Sans Mono:antialias=true:pixelsize=15
+!URxvt.boldFont: xft:DejaVu Sans Mono:style=bold:antialias=true:pixelsize=13
+URxvt*letterSpace: 0
+!URxvt.font: xft:DejaVu Sans Mono:pixelsize=18
+!URxvt.boldFont: xft:DejaVu Sans Mono:style=bold:pixelsize=18
+!URxvt.font: xft:Droid Sans Mono:pixelsize=15
+!URxvt*font: xft:Envy Code R:pixelsize=16:antialias=false:hinting=false
+!URxvt*boldFont: xft:Envy Code R:bold:pixelsize=16:antialias=false:hinting=false
+!URxvt.font: -*-nimbus mono l-*-r-*-*-*-*-*-*-*-*-*-*
+!URxvt.font: -monotype-andale mono-*-*-*-*-*-*-*-*-*-*-*-1
+URxvt.background:   #000066
+URxvt.foreground:   yellow
+URxvt.colorBD:      green
+URxvt.colorUL:      #00aaaa
+
+
+
 
 !-----------------------------	TAB-BAR OPTIONS ------------------------------ #
-Mrxvt.bottomTabbar:	True
-Mrxvt.autohideTabbar:	True
-Mrxvt.maxTabWidth:	17
-Mrxvt.highlightTabOnBell:	True
-Mrxvt.syncTabTitle:	False
-Mrxvt.showMenu:		False
-Mrxvt.sessionMgt:	True
+!Mrxvt.bottomTabbar:	True
+!Mrxvt.autohideTabbar:	True
+!Mrxvt.maxTabWidth:	17
+! This will highlight the tabs *only* when a BELL is echoed
+! Mrxvt.highlightTabOnBell:	True
+!Mrxvt.syncTabTitle:	False
+!Mrxvt.showMenu:		False
+!Mrxvt.sessionMgt:	True
 
-Mrxvt.itabForeground:		#909090
-Mrxvt.itabBackground:		#101010
-Mrxvt.tabForeground:		#9a9a9a
-Mrxvt.tabBackground:		#00009a
+!Mrxvt.itabForeground:		#909090
+!Mrxvt.itabBackground:		#101010
+!Mrxvt.tabForeground:		#9a9a9a
+!Mrxvt.tabBackground:		#00009a
 
 
 !Mrxvt.itabBackground:		#1010aa
@@ -53,84 +83,85 @@ Mrxvt.tabBackground:		#00009a
 !Mrxvt.itabForeground:		#909090
 !Mrxvt.tabForeground:		#000000
 ! ---------------------- SCROLLING / SCROLLBAR OPTIONS ----------------------- #
-Mrxvt.scrollbarRight:	True
-Mrxvt.scrollbarStyle:	rxvt
-Mrxvt.scrollColor:		#808080
-Mrxvt.scrollTtyOutputInhibit:	True
-Mrxvt.scrollTtyKeypress:	True
+!Mrxvt.scrollbarRight:	True
+!Mrxvt.scrollbarStyle:	rxvt
+!Mrxvt.scrollColor:		#808080
+!Mrxvt.scrollTtyOutputInhibit:	True
+!Mrxvt.scrollTtyKeypress:	True
 !Mrxvt.troughColor:		#202020
-Mrxvt.saveLines:		10000
+!Mrxvt.saveLines:		10000
 ! ---------------------------------- CURSOR ---------------------------------- #
-Mrxvt.cursorBlink:		True
-Mrxvt.cursorBlinkInterval:	800
-Mrxvt.cursorColor:		#ff6622
-Mrxvt.cursorColor2:		#000000
+!Mrxvt.cursorBlink:		True
+!Mrxvt.cursorBlinkInterval:	800
+!Mrxvt.cursorColor:		#ff6622
+!Mrxvt.cursorColor2:		#000000
 ! ---------------------------------- FONTS ----------------------------------- #
 !Mrxvt*decTerminalID:	220
-Mrxvt.font:             10x20
+!Mrxvt.font:             10x20
 !Mrxvt.font: -*-dejavu sans mono-medium-r-normal-*-*-*-*-*-*-*-*-*
 !Mrxvt.font: -monotype-andale mono-*-*-*-*-*-*-*-*-*-*-*-1
-Mrxvt.boldFont:         10x20bold
-Mrxvt.background:	#000000
-Mrxvt.foreground:       yellow
+!Mrxvt.boldFont:         10x20bold
+!Mrxvt.background:	#0000a8
+!Mrxvt.foreground:       yellow
 !Mrxvt.colorBD:          green
 !Mrxvt.colorUL:          #00aaaa
 !Mrxvt.pointerColor:     LightSlateBlue
 !Mrxvt.transparent:      no
 !Mrxvt.tintingType:      or
 !Mrxvt.tinting:          #ffffff
-Mrxvt.loginShell:       True
-Mrxvt.cutChars:			:=/~#@?%&_-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0abcdefghijklmnopqrstuvwxyz
+!Mrxvt.loginShell:       True
+!Mrxvt.cutChars:			:=/~#@?%&_-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0abcdefghijklmnopqrstuvwxyz
 
 !Mrxvt*fading:		90
 
-Mrxvt.initProfileList:	    0,1
+!Mrxvt.initProfileList:	    0,1
 
 
 !dont activate cause it slows down the start
 !Mrxvt*shading: 80
 !Mrxvt*transpscrollbar: False
-Mrxvt*geometry:         125x25
+!Mrxvt.geometry:         140x25
 
 
-Mrxvt*macro*Alt+1: GotoTab 1
-Mrxvt*macro*Alt+2: GotoTab 2
-Mrxvt*macro*Alt+3: GotoTab 3
-Mrxvt*macro*Alt+4: GotoTab 4
-Mrxvt*macro*Alt+5: GotoTab 5
-Mrxvt*macro*Alt+6: GotoTab 6
-Mrxvt*macro*Alt+7: GotoTab 7
-Mrxvt*macro*Alt+8: GotoTab 8
-Mrxvt*macro*Alt+9: GotoTab 9
+!Mrxvt.macro.Alt+1: GotoTab 1
+!Mrxvt.macro.Alt+2: GotoTab 2
+!Mrxvt.macro.Alt+3: GotoTab 3
+!Mrxvt.macro.Alt+4: GotoTab 4
+!Mrxvt.macro.Alt+5: GotoTab 5
+!Mrxvt.macro.Alt+6: GotoTab 6
+!Mrxvt.macro.Alt+7: GotoTab 7
+!Mrxvt.macro.Alt+8: GotoTab 8
+!Mrxvt.macro.Alt+9: GotoTab 9
+!Mrxvt.macro.Ctrl+Shift+g:        MonitorTab INACTIVITY
+!Mrxvt.monitorTimeout:         10000
 
-Mrxvt.macro.Ctrl+n: NewTab "%G"
-Mrxvt.macro.Shift+Left: GotoTab -1
-Mrxvt.macro.Shift+Right: GotoTab +1
-Mrxvt.macro.Shift+Insert: Paste
-Mrxvt.macro.Shift+Prior: Scroll -1p
-Mrxvt.macro.Shift+Next: Scroll 1p
-Mrxvt.macro.Shift+Up: Scroll -1
-Mrxvt.macro.Shift+Down: Scroll 1
-Mrxvt.internalBorder:		0
+!Mrxvt.macro.Ctrl+n: NewTab "%G"
+!Mrxvt.macro.Alt+g: NewTab /home/adrian/local/bin/e %s
+!Mrxvt.macro.Shift+Left: GotoTab -1
+!Mrxvt.macro.Shift+Right: GotoTab +1
+!Mrxvt.macro.Shift+Insert: Paste
+!Mrxvt.macro.Shift+Prior: Scroll -1p
+!Mrxvt.macro.Shift+Next: Scroll 1p
+!Mrxvt.macro.Shift+Up: Scroll -1
+!Mrxvt.macro.Shift+Down: Scroll 1
+!Mrxvt.internalBorder:		0
+!Mrxvt.pointerShape: left_ptr
 
-!XTerm*font:             -*-terminus-medium-*-*-*-14-*-*-*-*-*-*-*
-!XTerm*boldFont:         -*-terminus--*-*-*-14-*-*-*-*-*-*-*
-!XTerm*font: 9x15
-!XTerm*boldFont:9x15bold
+!XTerm*font: Terminus-18
+!XTerm*boldFont:10x20bold
 !XTerm*background:       black
 !XTerm*foreground:       grey60
 !XTerm*scrollBar:        True
 !XTerm*scrollBar_right:  True
 !XTerm*saveLines:	10000
 !XTerm*loginShell:       True
-!XTerm*colorBD:          white
 !XTerm*colorBD:          green
 !XTerm*colorUL:          #00aaaa
 !XTerm*pointerColor:     LightSlateBlue
 !XTerm*transparent:	False
 !XTerm*tintingType:      or
 !XTerm*tinting:          #ffffff
-!XTerm*fading:	90
+!XTerm*fading:	40
 
 !dont activate cause it slows down the start
 !XTerm*shading: 80
