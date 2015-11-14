@@ -1,11 +1,46 @@
-#! /bin/bash
+#! /bin/sh
 
-IFS=':' read FILE LINE JUNK <<<"$1"
-
-[ -n "$LINE" ] && LINE="+$LINE"
-AFILE=$FILE
-if [ ! -e "$FILE" ]; then
-	AFILE=`find . -name "$(basename $FILE)"`
-	[ "$AFILE" = "" ] && echo "No file: $FILE" && exit 1
+if [ -n "$DISPLAY" -o "$DISPLAY" = "localhost:10.0" ] ; then
+	export DISPLAY=:0
 fi
-vim $AFILE $LINE
+
+_arg="$@"
+[ $# = 0 ] && _arg="$(xclip -o)"
+
+IFS=':' read _file _line JUNK <<EOI
+$_arg
+EOI
+
+[ -n "$_line" ] && _line="+$_line"
+
+if [ ! -e "$_file" ]; then
+	OLDIFS=$IFS
+	IFS=/
+	_found=0
+	for f in $_file ; do
+		if [ -z "$p" ]; then
+			p="$f"
+		else
+			p="$p/$f"
+		fi
+		if [ -e "${_file#$p/}" ]; then
+			_file="${_file#$p/}"
+			_found=1
+			break
+		fi
+	done
+	IFS=$OLDIFS
+	if [ $_found -eq 0 ]; then
+		_file=$(find . -name `basename $_file` 2>/dev/null)
+	fi
+	[ -z "$_file" ] && echo "No file: $@" && exit 1
+fi
+
+# use tmux session name
+_server="$(tmux display-message -p '#S' | tr '[a-z]' '[A-Z]')"
+[ -z "$_server" ] && _server=E1
+if [ $(vim --serverlist | grep "${_server}[[:digit:]]*") ]; then
+	_remote_tab="--remote-tab"
+fi
+
+exec "$EDITOR" --servername "$_server" $_remote_tab $_line $_file
