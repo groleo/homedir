@@ -1,4 +1,4 @@
-#! /bin/bash -e
+#! /bin/sh -e
 
 ###########################################
 # Packages
@@ -73,6 +73,9 @@ ln -sf $PWD/vimrc ${HOME}/.vimrc
 
 rm -f ${HOME}/.tmux.conf
 ln -sf $PWD/tmux.conf ${HOME}/.tmux.conf
+
+rm -f ${HOME}/.gdbinit
+ln -sf $PWD/gdbinit ${HOME}/.gdbinit
 
 ###########################################
 # Vim Setup
