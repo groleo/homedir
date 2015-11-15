@@ -3,6 +3,8 @@
 ###########################################
 # Packages
 ###########################################
+install_packages()
+{
 _basic="vim vim-nox vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server"
 _dev="gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
 _mesa="g++ xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
@@ -21,10 +23,13 @@ sudo -E apt-get install \
 	#libsqlite3-0-dbg linux-tools-3.2 libc6-dbg \
 	#ia32-libs lib32ncurses5 lib32stdc++6 \
 	#devscripts \
+}
 
 ###########################################
 # Git config
 ###########################################
+setup_git()
+{
 git config --global user.name "Adrian Negreanu"
 git config --global user.email "groleo@gmail.com"
 git config --global color.ui true
@@ -51,14 +56,15 @@ else
 fi
 
 cd homedir
+}
 
-rm -f ${HOME}/.bash_env
-ln -sf $PWD/bash_env ${HOME}/.bash_env
+[ ! -d ${HOME}/.local/temp ] && mkdir -p ${HOME}/.local/temp
+[ ! -d ${HOME}/.local/bin ] && mkdir -p ${HOME}/.local/bin
+
 if [ ! `grep .bash_env ${HOME}/.bashrc` ]; then
 	echo '. ${HOME}/.bash_env' >> ${HOME}/.bashrc
 fi
 
-[ ! -d ${HOME}/.local/bin ] && mkdir -p ${HOME}/.local/bin
 for i in bin/*; do
 	ln -sf $PWD/$i ${HOME}/.local/bin/
 done
@@ -66,7 +72,9 @@ done
 ###########################################
 # dotrc files
 ###########################################
-[ ! -d ${HOME}/.local/temp ] && mkdir -p ${HOME}/.local/temp
+
+rm -f ${HOME}/.bash_env
+ln -sf $PWD/bash_env ${HOME}/.bash_env
 
 rm -f ${HOME}/.vimrc
 ln -sf $PWD/vimrc ${HOME}/.vimrc
@@ -76,6 +84,10 @@ ln -sf $PWD/tmux.conf ${HOME}/.tmux.conf
 
 rm -f ${HOME}/.gdbinit
 ln -sf $PWD/gdbinit ${HOME}/.gdbinit
+
+rm -f ${HOME}/.Xresources
+ln -sf $PWD/Xresources ${HOME}/.Xresources
+xrdb -load ~/.Xresources
 
 ###########################################
 # Vim Setup
@@ -109,4 +121,3 @@ rm -rf vim-fswitch fswitch-*.zip*
 wget https://raw.github.com/ciaranm/detectindent/master/plugin/detectindent.vim
 cp detectindent.vim ${HOME}/.vim/
 rm -rf detectindent.vim
-

@@ -22,13 +22,21 @@ export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
 
 [[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh
+
 _extra_git='X'
+#Debian
 if [ -f /etc/bash_completion.d/git-prompt ] ; then
     source /etc/bash_completion.d/git-prompt
     _extra_git='[$(__git_ps1 "%s")]'
 fi
 if [ -f /etc/bash_completion.d/git ]; then
     source /etc/bash_completion.d/git
+    _extra_git='[$(__git_ps1 "%s")]'
+fi
+
+# Fedora
+if [ -f /usr/share/git-core/contrib/completion/git-prompt.sh ]; then
+    source /usr/share/git-core/contrib/completion/git-prompt.sh
     _extra_git='[$(__git_ps1 "%s")]'
 fi
 
@@ -76,6 +84,8 @@ alias tmux='tmux -2 -u'
 alias f=fg
 
 # Intel
+setup_proxy()
+{
 _mirror=ir
 export http_proxy=http://proxy.${_mirror}.intel.com:911
 export ftp_proxy=ftp://proxy.${_mirror}.intel.com:911
@@ -84,6 +94,7 @@ export ALL_PROXY=socks://proxy.${_mirror}.intel.com:1080
 export https_proxy=https://proxy.${_mirror}.intel.com:912
 export no_proxy=localhost,.intel.com,10.0.0.0/8
 export GIT_PROXY_COMMAND=${HOME}/.local/bin/socks-gw
+}
 
 # Perforce
 export P4DIFF=diff
