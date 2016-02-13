@@ -58,10 +58,13 @@ fi
 cd homedir
 }
 
+install_packages
+setup_git
+
 [ ! -d ${HOME}/.local/temp ] && mkdir -p ${HOME}/.local/temp
 [ ! -d ${HOME}/.local/bin ] && mkdir -p ${HOME}/.local/bin
 
-if [ ! `grep .bash_env ${HOME}/.bashrc` ]; then
+if [ "$(grep .bash_env ${HOME}/.bashrc)" = "" ]; then
 	echo '. ${HOME}/.bash_env' >> ${HOME}/.bashrc
 fi
 
