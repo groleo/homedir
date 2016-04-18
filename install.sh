@@ -85,6 +85,9 @@ ln -sf $PWD/vimrc ${HOME}/.vimrc
 rm -f ${HOME}/.tmux.conf
 ln -sf $PWD/tmux.conf ${HOME}/.tmux.conf
 
+rm -rf ${HOME}/.local/gdb
+ln -sf $PWD/gdb ${HOME}/.local/gdb
+
 rm -f ${HOME}/.gdbinit
 ln -sf $PWD/gdbinit ${HOME}/.gdbinit
 
