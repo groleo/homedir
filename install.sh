@@ -1,28 +1,29 @@
-#! /bin/sh -e
+#! /bin/sh
+
+set -e
 
 ###########################################
 # Packages
 ###########################################
 install_packages()
 {
-_basic="vim vim-nox vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server"
-_dev="gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
-_mesa="g++ xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
-_wayland="autoconf libtool sudo autopoint intltool"
-_scm_basic="git git-doc"
-_scm_extra="git-cvs git-svn git-email subversion"
-sudo -E apt-get install \
-	$_basic \
-	$_dev \
-	$_mesa \
-	$_wayland \
-	$_scm_basic
-
-	#xclip \
-	#cpulimit \
-	#libsqlite3-0-dbg linux-tools-3.2 libc6-dbg \
-	#ia32-libs lib32ncurses5 lib32stdc++6 \
-	#devscripts \
+	_basic="vim vim-nox vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server"
+	_dev="gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
+	_mesa="g++ xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
+	_wayland="autoconf libtool sudo autopoint intltool"
+	_scm_basic="git git-doc"
+	_scm_extra="git-cvs git-svn git-email subversion"
+	sudo -E apt-get install \
+		$_basic \
+		$_dev \
+		$_mesa \
+		$_wayland \
+		$_scm_basic
+		#xclip \
+		#cpulimit \
+		#libsqlite3-0-dbg linux-tools-3.2 libc6-dbg \
+		#ia32-libs lib32ncurses5 lib32stdc++6 \
+		#devscripts \
 }
 
 ###########################################
@@ -30,36 +31,41 @@ sudo -E apt-get install \
 ###########################################
 setup_git()
 {
-git config --global user.name "Adrian Negreanu"
-git config --global user.email "groleo@gmail.com"
-git config --global color.ui true
-git config --global sendemail.signedoffbycc no
+	git config --global user.name "Adrian Negreanu"
+	git config --global user.email "groleo@gmail.com"
+	git config --global color.ui true
+	git config --global sendemail.signedoffbycc no
 
-git config --global sendemail.waffle.to "waffle@lists.freedesktop.org"
-git config --global sendemail.waffle.from "Adrian Negreanu <groleo@gmail.com>"
+	git config --global sendemail.waffle.to "waffle@lists.freedesktop.org"
+	git config --global sendemail.waffle.from "Adrian Negreanu <groleo@gmail.com>"
 
-git config --global sendemail.mesa.to "mesa-dev@lists.freedesktop.org"
-git config --global sendemail.mesa.from "Adrian Negreanu <groleo@gmail.com>"
+	git config --global sendemail.mesa.to "mesa-dev@lists.freedesktop.org"
+	git config --global sendemail.mesa.from "Adrian Negreanu <groleo@gmail.com>"
 
-git config --global sendemail.piglit.to "piglit@lists.freedesktop.org"
-git config --global sendemail.piglit.from "Adrian Negreanu <groleo@gmail.com>"
+	git config --global sendemail.piglit.to "piglit@lists.freedesktop.org"
+	git config --global sendemail.piglit.from "Adrian Negreanu <groleo@gmail.com>"
 
-git config --global sendemail.systemtap.to "systemtap@sourceware.org"
-git config --global sendemail.systemtap.from "Adrian Negreanu <groleo@gmail.com>"
-
-if [ ! -d homedir ]; then
-	git clone https://github.com/groleo/homedir.git
-else
-	cd homedir
-	git pull
-	cd -
-fi
-
-cd homedir
+	git config --global sendemail.systemtap.to "systemtap@sourceware.org"
+	git config --global sendemail.systemtap.from "Adrian Negreanu <groleo@gmail.com>"
 }
 
+###############################
+clone_homedir() {
+	if [ ! -d homedir ]; then
+		git clone https://github.com/groleo/homedir.git
+	else
+		cd homedir
+		git pull
+		cd -
+	fi
+}
+
+###############################
 install_packages
 setup_git
+clone_homedir
+
+cd homedir
 
 [ ! -d ${HOME}/.local/temp ] && mkdir -p ${HOME}/.local/temp
 [ ! -d ${HOME}/.local/bin ] && mkdir -p ${HOME}/.local/bin
@@ -93,7 +99,10 @@ ln -sf $PWD/gdbinit ${HOME}/.gdbinit
 
 rm -f ${HOME}/.Xresources
 ln -sf $PWD/Xresources ${HOME}/.Xresources
-xrdb -load ~/.Xresources
+
+if [ -n "$DISPLAY" ]; then
+	xrdb -load ~/.Xresources
+fi
 
 ###########################################
 # Vim Setup
