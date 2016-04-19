@@ -7,7 +7,7 @@ set -e
 ###########################################
 install_packages()
 {
-	_basic="vim vim-nox vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server"
+	_basic="vim vim-gtk vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server xclip"
 	_dev="gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
 	_mesa="g++ xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
 	_wayland="autoconf libtool sudo autopoint intltool"
@@ -19,7 +19,6 @@ install_packages()
 		$_mesa \
 		$_wayland \
 		$_scm_basic
-		#xclip \
 		#cpulimit \
 		#libsqlite3-0-dbg linux-tools-3.2 libc6-dbg \
 		#ia32-libs lib32ncurses5 lib32stdc++6 \
