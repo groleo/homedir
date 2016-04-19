@@ -37,7 +37,7 @@ if [ ! -e "$_file" ]; then
 fi
 
 # use tmux session name
-_server="$(tmux display-message -p '#S' | tr '[a-z]' '[A-Z]')"
+_server="$(tmux display-message -p '#S' 2>/dev/null | tr '[a-z]' '[A-Z]')"
 [ -z "$_server" ] && _server=E1
 if [ $(vim --serverlist | grep "${_server}[[:digit:]]*") ]; then
 	_remote_tab="--remote-tab"
