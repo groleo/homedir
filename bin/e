@@ -5,7 +5,10 @@ if [ -n "$DISPLAY" -o "$DISPLAY" = "localhost:10.0" ] ; then
 fi
 
 _arg="$@"
+
 [ $# = 0 ] && _arg="$(xclip -o)"
+
+[ -z "$_arg" ] && exec $EDITOR
 
 IFS=':' read _file _line JUNK <<EOI
 $_arg
