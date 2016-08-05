@@ -44,13 +44,17 @@ aliases()
 }
 setup_proxy()
 {
-    _mirror=ir
+    _mirror=jf
     export http_proxy=http://proxy.${_mirror}.intel.com:911
-    export ftp_proxy=ftp://proxy.${_mirror}.intel.com:911
-    export all_proxy=socks://proxy.${_mirror}.intel.com:1080
-    export ALL_PROXY=socks://proxy.${_mirror}.intel.com:1080
+    export HTTP_PROXY=$http_proxy
     export https_proxy=https://proxy.${_mirror}.intel.com:912
+    export HTTPS_PROXY=$https_proxy
+    export ftp_proxy=ftp://proxy.${_mirror}.intel.com:911
+    export FTP_PROXY=$ftp_proxy
     export no_proxy=localhost,.intel.com,10.0.0.0/8
+    export NO_PROXY=$no_proxy
+    export all_proxy=socks://proxy.${_mirror}.intel.com:1080
+    export ALL_PROXY=$all_proxy
     export GIT_PROXY_COMMAND=${HOME}/.local/bin/socks-gw
 }
 setup_perforce()
