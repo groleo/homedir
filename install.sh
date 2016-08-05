@@ -135,3 +135,8 @@ rm -rf vim-fswitch fswitch-*.zip*
 wget https://raw.github.com/ciaranm/detectindent/master/plugin/detectindent.vim
 cp detectindent.vim ${HOME}/.vim/
 rm -rf detectindent.vim
+
+
+
+
+gcc connect.c -o ${HOME}/.local/bin/connect
