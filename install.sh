@@ -49,22 +49,30 @@ setup_git()
 }
 
 ###############################
-clone_homedir() {
-	if [ ! -d homedir ]; then
-		git clone https://github.com/groleo/homedir.git
+install_packages
+setup_git
+
+inside_homedir() {
+	origin_url="$(git config remote.origin.url)"
+	if [ "$origin_url" = "https://github.com/groleo/homedir.git" ]; then
+		return 1
 	else
-		cd homedir
-		git pull
-		cd -
+		return 0
 	fi
 }
 
-###############################
-install_packages
-setup_git
-clone_homedir
-
-cd homedir
+if [ -d homedir ]; then
+	cd homedir
+	git pull
+else
+	# check if we're already cd-ed inside homedir
+	if [ inside_homedir -eq 1 ]; then
+		git pull
+	else
+		git clone https://github.com/groleo/homedir.git
+		cd homedir
+	fi
+fi
 
 [ ! -d ${HOME}/.local/temp ] && mkdir -p ${HOME}/.local/temp
 [ ! -d ${HOME}/.local/bin ] && mkdir -p ${HOME}/.local/bin
