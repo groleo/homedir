@@ -127,14 +127,20 @@ nnoremap <Leader>p :diffput<cr>
 " Alt-s: horizontal split
 inoremap <silent> s <C-O>:split<CR>
 noremap <silent> s :split<CR>
+inoremap <silent> <A-s> <C-O>:split<CR>
+noremap <silent> <A-s> :split<CR>
 
 " Alt-v: vertical split
 inoremap <silent> v <C-O>:vsplit<CR>
 noremap <silent> v :vsplit<CR>
+inoremap <silent> <A-v> <C-O>:vsplit<CR>
+noremap <silent> <A-v> :vsplit<CR>
 
 " Alt-q: quit
 inoremap <silent> q <C-O>:q<CR>
 noremap <silent> q :q<CR>
+inoremap <silent> <A-q> <C-O>:q<CR>
+noremap <silent> <A-q> :q<CR>
 
 " Alt-f: alternate file
 inoremap <silent>f <C-O>:A
