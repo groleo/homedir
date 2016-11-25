@@ -7,7 +7,7 @@ set -e
 ###########################################
 install_packages()
 {
-	_basic="vim vim-gtk vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server xclip"
+	_basic="rxvt-unicode-256color vim vim-gtk vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server xclip"
 	_dev="gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
 	_mesa="g++ xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
 	_wayland="autoconf libtool sudo autopoint intltool"
@@ -143,8 +143,5 @@ rm -rf vim-fswitch fswitch-*.zip*
 wget https://raw.github.com/ciaranm/detectindent/master/plugin/detectindent.vim
 cp detectindent.vim ${HOME}/.vim/
 rm -rf detectindent.vim
-
-
-
 
 gcc connect.c -o ${HOME}/.local/bin/connect
