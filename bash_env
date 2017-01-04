@@ -203,7 +203,7 @@ setup_editor
 setup_locales
 export_path
 aliases
-setup_proxy
+#setup_proxy
 setup_perforce
 setup_display
 
