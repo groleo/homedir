@@ -8,7 +8,7 @@ set -e
 install_packages()
 {
 	_basic="rxvt-unicode-256color vim vim-gtk vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server xclip"
-	_dev="gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
+	_dev="make gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
 	_mesa="g++ xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
 	_wayland="autoconf libtool sudo autopoint intltool"
 	_scm_basic="git git-doc"
@@ -24,7 +24,7 @@ install_packages()
 		#ia32-libs lib32ncurses5 lib32stdc++6 \
 		#devscripts \
 
-	sudo apt-get remove unity-webapps-common
+#	sudo apt-get remove unity-webapps-common
 }
 
 ###########################################
