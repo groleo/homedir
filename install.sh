@@ -23,6 +23,8 @@ install_packages()
 		#libsqlite3-0-dbg linux-tools-3.2 libc6-dbg \
 		#ia32-libs lib32ncurses5 lib32stdc++6 \
 		#devscripts \
+
+	sudo apt-get remove unity-webapps-common
 }
 
 ###########################################
