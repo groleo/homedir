@@ -53,12 +53,11 @@ install_packages
 setup_git
 
 inside_homedir() {
-	origin_url="$(git config remote.origin.url)"
+	origin_url="$(git config remote.origin.url || true)"
 	if [ "$origin_url" = "https://github.com/groleo/homedir.git" ]; then
 		return 1
-	else
-		return 0
 	fi
+	return 0
 }
 
 if [ -d homedir ]; then
@@ -66,7 +65,7 @@ if [ -d homedir ]; then
 	git pull
 else
 	# check if we're already cd-ed inside homedir
-	if [ inside_homedir -eq 1 ]; then
+	if [ $(inside_homedir) -eq 1 ]; then
 		git pull
 	else
 		git clone https://github.com/groleo/homedir.git
