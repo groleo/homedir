@@ -8,11 +8,11 @@ set -e
 install_packages()
 {
 	_basic="rxvt-unicode-256color vim vim-gtk vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server xclip"
-	_dev="make gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
+	_dev="python-pip cmake make gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
 	_mesa="g++ xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
 	_wayland="autoconf libtool sudo autopoint intltool"
-	_scm_basic="git git-doc"
-	_scm_extra="git-cvs git-svn git-email subversion"
+	_scm_basic="tig git git-doc"
+	_scm_extra="git-cvs git-svn git-email subversion vim-editorconfig"
 	sudo -E apt-get install \
 		$_basic \
 		$_dev \
@@ -48,7 +48,12 @@ setup_git()
 
 	git config --global sendemail.systemtap.to "systemtap@sourceware.org"
 	git config --global sendemail.systemtap.from "Adrian Negreanu <groleo@gmail.com>"
-}
+
+	# Aliases
+	git config --global alias.ll "log --oneline --graph --all --decorate"
+	#git config --global alias.l1 "log --oneline"
+	git config --global alias.bs "for-each-ref --sort='-committerdate:iso8601' --format=' %(committerdate:relative)%09%(refname:short)' refs/heads"
+	git config --global alias.l1 "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
 
 ###############################
 install_packages
@@ -144,5 +149,8 @@ rm -rf vim-fswitch fswitch-*.zip*
 wget https://raw.github.com/ciaranm/detectindent/master/plugin/detectindent.vim
 cp detectindent.vim ${HOME}/.vim/
 rm -rf detectindent.vim
+
+#wget https://github.com/vimwiki/vimwiki/archive/master.zip
+
 
 gcc connect.c -o ${HOME}/.local/bin/connect

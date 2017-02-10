@@ -157,6 +157,7 @@ export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
 
 [[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh
+[[ -s /usr/share/autojump/autojump.bash ]] && source /usr/share/autojump/autojump.bash
 
 _extra_git='X'
 #Debian
@@ -206,3 +207,5 @@ aliases
 #setup_proxy
 setup_perforce
 setup_display
+
+# . /home/dev/workspace/Yocto/y/environment-setup-cortexa9hf-neon-poky-linux-gnueabi

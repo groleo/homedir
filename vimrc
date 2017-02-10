@@ -81,7 +81,8 @@ autocmd FileType make set noexpandtab shiftwidth=8 " Use real tabs for Makefiles
 let g:Tlist_Process_File_Always=1
 let g:showmarks_enable=1
 "let g:vimwiki_list = [{'path': '~/Documents/vimwiki/', 'path_html': '~/public_html/vimwiki','auto_export': 1}]
-let g:vimwiki_list = [{"path": '~/Documents/vimwiki/', 'path_html': '~/public_html/vimwiki', 'syntax': 'markdown', 'ext': '.mkd', 'custom_wiki2html': '~/.local/bin/md2html.sh', 'auto_export': 1,"css_file": '~/public_html/vimwiki/pandoc.css'}]
+"let g:vimwiki_list = [{"path": '~/Documents/vimwiki/', 'path_html': '~/public_html/vimwiki', 'syntax': 'markdown', 'ext': '.mkd', 'custom_wiki2html': '~/.local/bin/md2html', 'auto_export': 1,"css_file": '~/public_html/vimwiki/pandoc.css'}]
+let g:vimwiki_list = [{"path": '~/public_html/wiki/', 'syntax': 'markdown', 'ext': '.md.htm', 'template_path': '~/public_html/wiki/templates', }]
 let &colorcolumn=join(range(81,999),",")
 highlight ColorColumn ctermbg=235 guibg=#2c2d27
 
