@@ -54,7 +54,7 @@ setup_git()
 	#git config --global alias.l1 "log --oneline"
 	git config --global alias.bs "for-each-ref --sort='-committerdate:iso8601' --format=' %(committerdate:relative)%09%(refname:short)' refs/heads"
 	git config --global alias.l1 "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
-
+}
 ###############################
 install_packages
 setup_git
