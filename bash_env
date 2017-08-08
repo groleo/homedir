@@ -36,11 +36,15 @@ aliases()
 {
     alias grep="grep --color=auto --exclude='*.orig' --exclude='tags' --exclude-dir='.hg' --exclude-dir='.git' --exclude-dir='out'"
     alias psg="ps -augxww | grep -v grep | grep -i"
-    alias cgrep="grep --color=always --exclude='*.orig' --exclude='tags' --exclude-dir='.hg' --exclude-dir='.git' --exclude-dir='out'"
     alias cd-="cd -"
     alias l1='ls -1'
     alias tmux='tmux -2 -u'
     alias f=fg
+}
+
+Cgrep()
+{
+    find . -iname '*.c' -o -iname '*.h' -o -iname '*.hpp' -o -iname '*.cpp' | xargs grep -n --color=always --exclude='*.orig' --exclude='tags' --exclude-dir='.hg' --exclude-dir='.git' --exclude-dir='out' $*
 }
 setup_proxy()
 {
@@ -136,7 +140,7 @@ EXT_COLOR()
 #XDG_DATA_DIRS="$HOME/.local/share:/usr/share:/usr/local/share"
 #alias tar='tar --use-compress-program=pigz'
 
-HISTCONTROL="ignoredups:erasedups"
+HISTCONTROL="ignoredups:erasedups:ignorespace"
 HISTSIZE=1048576
 HISTFILESIZE=1048576
 LAST_HISTORY_WRITE=$SECONDS
@@ -183,8 +187,9 @@ __android_extra() {
 }
 
 
-sep="-------------------------------------------------------------------------------"
-export PS1='\j\[\033[01;33m\]'"${sep}"'\n\[\033[01;32m\]\u@\h\[\033[01;31m\]'$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$ '
+separator="-------------------------------------------------------------------------------"
+#export PS1='\j--'${OLDPWD}${separator}'\n\[\033[01;32m\]\u@\h\[\033[01;31m\]'$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$ \e[0m'
+export PS1='\j----\[\033[01;33m\]'"${separator}"'\n\[\033[01;32m\]\u@\h\[\033[01;31m\]'$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$ '
 [ -n "$SCHROOT_CHROOT_NAME" ] && export PS1="${PS1}+ "
 #http://linux-sxs.org/housekeeping/lscolors.html
 #export LS_COLORS='di=01;96:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
@@ -193,9 +198,26 @@ LS_COLORS="no=0;93:rs=0:di=01;37:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40
 
 case "$-" in
     *i*)
-    bind -x '"\eOP":"fg"'
+    bind -x '"\eOP":" fg"'
     set bell-style none
 esac
+
+export TERMINFO=${HOME}/.local/terminfo
+
+#use ctl keys to move forward and back in words
+bind '"\eOC":forward-word'
+bind '"\eOD":backward-word'
+#bind '"\e\e[C": forward-word'
+#bind '"\e\e[D": backward-word'
+#bind '"\e[D":backward-word'
+# mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
+#"\e[1;5C": forward-word
+#"\e[1;5D": backward-word
+
+#"\e[5C": forward-word
+#"\e[5D": backward-word
+
+
 export CCACHE_CPP2=yes
 export CCACHE_SLOPPINESS="time_macros,include_file_mtime,file_macro"
 ccache -M 30G > /dev/null
@@ -208,4 +230,17 @@ aliases
 setup_perforce
 setup_display
 
-# . /home/dev/workspace/Yocto/y/environment-setup-cortexa9hf-neon-poky-linux-gnueabi
+_workjump() {
+        local cur
+        cur=workspace/${COMP_WORDS[*]:1}
+        comps=$(autojump --complete $cur)
+        while read i; do
+            COMPREPLY=("${COMPREPLY[@]}" "${i}")
+        done <<EOF
+        $comps
+EOF
+}
+work() {
+    j $*
+}
+complete -F _workjump work

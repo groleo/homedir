@@ -1,8 +1,18 @@
-BasedOnStyle: llvm
+BasedOnStyle: WebKit
 AccessModifierOffset: -4
 BreakBeforeBinaryOperators: true
-ColumnLimit: 60
+ColumnLimit: 80
 Standard: Cpp11
 IndentWidth: 4
 BreakBeforeBraces: Allman
 AlignAfterOpenBracket: Align
+AlwaysBreakAfterDefinitionReturnType : false
+BinPackParameters : true
+BinPackArguments : true
+AlignTrailingComments : true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+TabWidth: 4
+UseTab: Never
+MaxEmptyLinesToKeep: 2

@@ -12,7 +12,7 @@ install_packages()
 	_mesa="g++ xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
 	_wayland="autoconf libtool sudo autopoint intltool"
 	_scm_basic="tig git git-doc"
-	_scm_extra="git-cvs git-svn git-email subversion vim-editorconfig"
+	_scm_extra="git-cvs git-svn git-email subversion vim-editorconfig libstdc++6-4.7-doc"
 	sudo -E apt-get install \
 		$_basic \
 		$_dev \
@@ -113,6 +113,9 @@ ln -sf $PWD/gdbinit ${HOME}/.gdbinit
 rm -f ${HOME}/.Xresources
 ln -sf $PWD/Xresources ${HOME}/.Xresources
 
+rm -f ${HOME}/.clang-format
+ln -sf $PWD/clang-format ${HOME}/.clang-format
+
 if [ -n "$DISPLAY" ]; then
 	xrdb -load ~/.Xresources
 fi
@@ -133,8 +136,6 @@ rm -rf detectindent/.git
 cp -r detectindent/* ${HOME}/.vim/
 rm -rf detectindent
 
-wget --content-disposition 'http://www.vim.org/scripts/download_script.php?src_id=7645'
-mv grep.vim ${HOME}/.vim/plugin/
 
 wget --content-disposition 'http://www.drchip.org/astronaut/vim/vbafiles/manpageview.vba.gz'
 gunzip manpageview.vba.gz
@@ -146,9 +147,9 @@ unzip fswitch-*.zip
 cp -r vim-fswitch/* ${HOME}/.vim/
 rm -rf vim-fswitch fswitch-*.zip*
 
-wget https://raw.github.com/ciaranm/detectindent/master/plugin/detectindent.vim
-cp detectindent.vim ${HOME}/.vim/
-rm -rf detectindent.vim
+wget 'https://raw.github.com/ciaranm/detectindent/master/plugin/detectindent.vim' -O ${HOME}/.vim/plugin/detectindent.vim
+wget 'http://www.vim.org/scripts/download_script.php?src_id=7645' -O ${HOME}/.vim/plugin/grep.vim
+wget 'http://www.vim.org/scripts/download_script.php?src_id=7218' -O ${HOME}/.vim/plugin/a.vim
 
 #wget https://github.com/vimwiki/vimwiki/archive/master.zip
 

@@ -73,6 +73,7 @@ set list listchars=tab:\|-,trail:.,extends:>
 set foldenable          "when off, all folds are open
 set foldmethod=marker
 set foldmarker={,}
+set foldcolumn=1
 let mapleader = "\\"
 "set esckeys
 
@@ -83,8 +84,13 @@ let g:showmarks_enable=1
 "let g:vimwiki_list = [{'path': '~/Documents/vimwiki/', 'path_html': '~/public_html/vimwiki','auto_export': 1}]
 "let g:vimwiki_list = [{"path": '~/Documents/vimwiki/', 'path_html': '~/public_html/vimwiki', 'syntax': 'markdown', 'ext': '.mkd', 'custom_wiki2html': '~/.local/bin/md2html', 'auto_export': 1,"css_file": '~/public_html/vimwiki/pandoc.css'}]
 let g:vimwiki_list = [{"path": '~/public_html/wiki/', 'syntax': 'markdown', 'ext': '.md.htm', 'template_path': '~/public_html/wiki/templates', }]
-let &colorcolumn=join(range(81,999),",")
-highlight ColorColumn ctermbg=235 guibg=#2c2d27
+let &colorcolumn=80
+" join(range(81,999),",")
+
+
+
+set timeoutlen=1000 ttimeoutlen=0
+
 
 
 " Bindings
@@ -144,32 +150,33 @@ inoremap <silent> <A-q> <C-O>:q<CR>
 noremap <silent> <A-q> :q<CR>
 
 " Alt-f: alternate file
-inoremap <silent>f <C-O>:A
-noremap <silent>f  :A<CR>
+inoremap <silent> f <C-O>:A
+noremap <silent>  f :A<CR>
 
 " below window
 inoremap <silent> <A-Down> <C-O><C-W>j
-noremap <silent> <A-Down> <C-W>j
-inoremap <silent> [1;3B <C-O><C-W>w
-noremap <silent> [1;3B <C-W>j
+noremap  <silent> <A-Down> <C-W>j
+inoremap <silent> j      <C-O><C-W>w
+noremap  <silent> j      <C-W>j
 
 " right window
-inoremap <silent> <A-Right> <C-O><C-W>l
-noremap <silent> <A-Right> <C-W>l
-inoremap <silent> [1;3C  <C-O><C-W>l
-noremap <silent> [1;3C <C-W>l
+inoremap <silent> <A-l> <C-O><C-W>l
+noremap  <silent> <A-l> <C-W>l
+inoremap <silent> l   <C-O><C-W>l
+noremap  <silent> l   <C-W>l
 
 " left window
-inoremap <silent> <A-Left> <C-O><C-W>h
-noremap <silent> <A-Left> <C-W>h
-inoremap <silent> [1;3D <C-O><C-W>h
-noremap <silent> [1;3D <C-W>h
+inoremap <silent> <A-h>   <C-O><C-W>h
+noremap  <silent> <A-h>   <C-W>h
+inoremap <silent> h     <C-O><C-W>h
+noremap  <silent> h     <C-W>h
+
 
 " window above
 inoremap <silent> <A-Up> <C-O><C-W>k
-noremap <silent> <A-Up> <C-W>k
-inoremap <silent> [1;3A <C-O><C-W>W
-noremap <silent> [1;3A <C-W>k
+noremap  <silent> <A-Up> <C-W>k
+inoremap <silent> k    <C-O><C-W>W
+noremap  <silent> k    <C-W>k
 
 " Tabview
 noremap <silent> <Leader>1 :tabn 1<CR>
@@ -283,8 +290,7 @@ function! InsertTabWrapper()
 endfunction
 inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 
-function! SetTab(width)
-      "set noexpandtab
+function! SoftTab(width)
       set expandtab           "use spaces instead of tabs
       "set softtabstop=a:width       "spaces to insert when <Tab> is pressed
       "Number of spaces that a <Tab> in the file counts for
@@ -292,12 +298,21 @@ function! SetTab(width)
       "Number of spaces to use for each step of (auto)indent
        execute "set shiftwidth=".str2nr(a:width)
 endfunction
+function! HardTab(width)
+      set noexpandtab
+      "Number of spaces that a <Tab> in the file counts for
+       execute "set tabstop=".str2nr(a:width)
+      "Number of spaces to use for each step of (auto)indent
+       execute "set shiftwidth=".str2nr(a:width)
+       set cindent
+endfunction
+command! -bar -nargs=1 HardTab call HardTab(<q-args>)
 
 function! DeleteHiddenBuffers()
 		let tpbl=[]
 		call map(range(1, tabpagenr('$')), 'extend(tpbl, tabpagebuflist(v:val))')
 		for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(tpbl, v:val)==-1')
-		silent execute 'bwipeout' buf
+		silent execute 'bwipeout!' buf
 		endfor
 endfunction
 
@@ -325,7 +340,7 @@ function! MyTabLine()
         "else
             let s .= (i+1).':'.filename
         "endif
-        let s .= '%#NONE#%#StatusLineNC# %#NONE#'
+        let s .= '%#NONE#%#TabLineFill# %#NONE#'
     endfor
     " after the last tab fill with TabLineFill and reset tab page #
     let s .= '%#TabLineFill#%T'
@@ -378,3 +393,9 @@ function! TextEnableCodeSnip(filetype,start,end,textSnipHl) abort
   \ start="'.a:start.'" end="'.a:end.'"
   \ contains=@'.group
 endfunction
+
+
+
+let g:netrw_list_hide = '^\./$'
+let g:netrw_hide = 1
+let g:netrw_banner=0 
