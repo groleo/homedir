@@ -2,8 +2,8 @@
 
 setup_editor()
 {
-    export EDITOR=/usr/bin/vim
-    export VISUAL=/usr/bin/vim
+    export EDITOR=/usr/bin/vimx
+    export VISUAL=/usr/bin/vimx
 }
 setup_locales()
 {
@@ -40,6 +40,8 @@ aliases()
     alias l1='ls -1'
     alias tmux='tmux -2 -u'
     alias f=fg
+    alias vi=vimx
+    alias ls='ls --color'
 }
 
 Cgrep()
