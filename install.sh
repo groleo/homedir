@@ -62,9 +62,9 @@ setup_git
 inside_homedir() {
 	origin_url="$(git config remote.origin.url || true)"
 	if [ "$origin_url" = "https://github.com/groleo/homedir.git" ]; then
-		return 1
+		echo 1
 	fi
-	return 0
+	echo 0
 }
 
 if [ -d homedir ]; then
@@ -155,3 +155,6 @@ wget 'http://www.vim.org/scripts/download_script.php?src_id=7218' -O ${HOME}/.vi
 
 
 gcc connect.c -o ${HOME}/.local/bin/connect
+if [ $(inside_homedir) -eq 0 ]; then
+	mv install.sh homedir
+endif
