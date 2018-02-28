@@ -107,6 +107,9 @@ ln -sf $PWD/tmux.conf ${HOME}/.tmux.conf
 rm -rf ${HOME}/.local/gdb
 ln -sf $PWD/gdb ${HOME}/.local/gdb
 
+rm -rf ${HOME}/.urxvt/
+ln -sf $PWD/urxvt ${HOME}/.urxvt
+
 rm -f ${HOME}/.gdbinit
 ln -sf $PWD/gdbinit ${HOME}/.gdbinit
 
