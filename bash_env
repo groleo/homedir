@@ -157,6 +157,7 @@ prompt_command() {
 PROMPT_COMMAND="prompt_command"
 export HISTCONTROL HISTSIZE HISTFILESIZE PROMPT_COMMAND
 shopt -s histappend
+shopt -s checkwinsize
 
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
@@ -189,9 +190,10 @@ __android_extra() {
 }
 
 
-separator=$(printf "\033[0;104m%${COLUMNS}s")
+separator=$(printf "\[\033[48;5;17m\]%${COLUMNS}s\[\033[0m\]")
 #export PS1='\j--'${OLDPWD}${separator}'\n\[\033[01;32m\]\u@\h\[\033[01;31m\]'$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$ \e[0m'
-export PS1="${separator}"'\n\[\033[01;32m\]\u@\h\[\033[01;31m\]'$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$ '
+# Non-printable sequences should be enclosed in \[ \]
+export PS1="${separator}\n\j\[\033[01;32m\]\u@\h\[\033[01;31m\]"$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$\[\033[0m\] '
 [ -n "$SCHROOT_CHROOT_NAME" ] && export PS1="${PS1}+ "
 #http://linux-sxs.org/housekeeping/lscolors.html
 #export LS_COLORS='di=01;96:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
