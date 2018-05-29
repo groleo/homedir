@@ -37,15 +37,14 @@ Xft.antialias:              true
 Xft.rgba:                   rgb
 Xft.hinting:                true
 Xft.hintstyle:              hintslight
-
 !URxvt.intensityStyles:  false  
 !URxvt.perl-ext-common: ,tabbed,
 URxvt.scrollBar:    false
 ! run fc-list  to get a list of xft fonts
 !URxvt*font:         xft:Terminus:pixelsize=18
 !URxvt*boldFont:     xft:Terminus:bold:pixelsize=18
-URxvt.font: xft:DejaVu Sans Mono:antialias=true:pixelsize=15
-!URxvt.boldFont: xft:DejaVu Sans Mono:style=bold:antialias=true:pixelsize=13
+URxvt.font: xft:DejaVu Sans Mono:antialias=true:pixelsize=17
+URxvt.boldFont: xft:DejaVu Sans Mono:style=bold:antialias=true:pixelsize=17
 URxvt*letterSpace: 0
 !URxvt.font: xft:DejaVu Sans Mono:pixelsize=18
 !URxvt.boldFont: xft:DejaVu Sans Mono:style=bold:pixelsize=18
@@ -54,19 +53,29 @@ URxvt*letterSpace: 0
 !URxvt*boldFont: xft:Envy Code R:bold:pixelsize=16:antialias=false:hinting=false
 !URxvt.font: -*-nimbus mono l-*-r-*-*-*-*-*-*-*-*-*-*
 !URxvt.font: -monotype-andale mono-*-*-*-*-*-*-*-*-*-*-*-1
-URxvt.background:   #000066
+URxvt.background:   #000040
 URxvt.foreground:   yellow
 URxvt.colorBD:      green
 URxvt.colorUL:      #00aaaa
 
-URxvt.perl-ext-common: ...,font-size
 
-URxvt.keysym.C-Up:     font-size:increase
-URxvt.keysym.C-Down:   font-size:decrease
-URxvt.keysym.C-S-Up:   font-size:incglobal
-URxvt.keysym.C-S-Down: font-size:decglobal
-URxvt.keysym.C-equal:  font-size:reset
-URxvt.keysym.C-slash:  font-size:show
+!URxvt.perl-ext-common: ...,font-size
+!URxvt.keysym.C-Up:     font-size:increase
+!URxvt.keysym.C-Down:   font-size:decrease
+!URxvt.keysym.C-S-Up:   font-size:incglobal
+!URxvt.keysym.C-S-Down: font-size:decglobal
+!URxvt.keysym.C-equal:  font-size:reset
+!URxvt.keysym.C-slash:  font-size:show
+
+URxvt.url-launcher:       sensible-browser
+URxvt.keysym.C-Delete:    matcher:last
+URxvt.keysym.M-Delete:    matcher:list
+URxvt.matcher.button:     1
+URxvt.matcher.pattern.1:  \\bwww\\.[\\w-]+\\.[\\w./?&@#-]*[\\w/-]
+URxvt.matcher.pattern.2:  ([\\S]+):(\\d+)(?=:|$)
+URxvt.matcher.launcher.2: /home/adrian/.local/bin/e $1:$2
+URxvt.perl-ext:           default,matcher
+URxvt.cursorBlink: 1
 
 
 !-----------------------------	TAB-BAR OPTIONS ------------------------------ #
