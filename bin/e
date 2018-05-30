@@ -1,12 +1,12 @@
 #! /bin/sh
 
+EDITOR=vim
+
 if [ -n "$DISPLAY" -o "$DISPLAY" = "localhost:10.0" ] ; then
 	export DISPLAY=:0
 fi
 
 _arg="$@"
-
-[ $# = 0 ] && _arg="$(xclip -o)"
 
 [ -z "$_arg" ] && exec $EDITOR
 
@@ -15,6 +15,7 @@ $_arg
 EOI
 
 [ -n "$_line" ] && _line="+$_line"
+
 
 if [ ! -e "$_file" ]; then
 	OLDIFS=$IFS
@@ -42,7 +43,9 @@ fi
 # use tmux session name
 _server="$(tmux display-message -p '#S' 2>/dev/null | tr '[a-z]' '[A-Z]')"
 [ -z "$_server" ] && _server=E1
-if [ $($EDITOR --serverlist | grep "${_server}[[:digit:]]*") ]; then
+
+$EDITOR --serverlist | grep "${_server}[[:digit:]]*" 1> /dev/null
+if [ "$?" -eq "0" ]; then
 	_remote_tab="--remote-tab"
 fi
 

@@ -1,11 +1,11 @@
 #! /bin/bash
 
-setup_editor()
+set_editor()
 {
     export EDITOR=/usr/bin/vimx
     export VISUAL=/usr/bin/vimx
 }
-setup_locales()
+set_locales()
 {
     export LANG="en_US.utf8"
     export LANGUAGE="en_US.utf8"
@@ -23,16 +23,16 @@ setup_locales()
     export LC_IDENTIFICATION="en_US.utf8"
     #export LC_ALL=en_US.UTF-8
 }
-export_path() {
+set_path() {
     EXTRA_PATH=/usr/share/ant/bin
     #EXTRA_PATH=${EXTRA_PATH}:${HOME}/workspace/HorseTooth/scripts/tools/build/bin
     EXTRA_PATH=${EXTRA_PATH}:${HOME}/workspace/chromium/depot_tools:${HOME}/.local/bin:/opt/java/jdk1.7.0_79/bin
     EXTRA_PATH=${EXTRA_PATH}:${HOME}/.local/opt/p4v-2015.1.1233444/bin/
     EXTRA_PATH=${EXTRA_PATH}:/opt/intel/vtune_amplifier_for_systems/bin64/
     export PATH=${PATH##$EXTRA_PATH}
-    export PATH=${EXTRA_PATH}:.:${PATH}
+    export PATH=${EXTRA_PATH}:${PATH}
 }
-aliases()
+set_aliases()
 {
     alias grep="grep --color=auto --exclude='*.orig' --exclude='tags' --exclude-dir='.hg' --exclude-dir='.git' --exclude-dir='out'"
     alias psg="ps -augxww | grep -v grep | grep -i"
@@ -40,7 +40,7 @@ aliases()
     alias l1='ls -1'
     alias tmux='tmux -2 -u'
     alias f=fg
-    alias vi=vimx
+    alias vi=vim
     alias ls='ls --color'
 }
 
@@ -48,29 +48,43 @@ Cgrep()
 {
     find . -iname '*.c' -o -iname '*.h' -o -iname '*.hpp' -o -iname '*.cpp' | xargs grep -n --color=always --exclude='*.orig' --exclude='tags' --exclude-dir='.hg' --exclude-dir='.git' --exclude-dir='out' $*
 }
-setup_proxy()
+set_proxy()
 {
     _mirror=jf
-    export http_proxy=http://proxy.${_mirror}.intel.com:911
+    export http_proxy=http://emea.nics.nxp.com:8080
     export HTTP_PROXY=$http_proxy
-    export https_proxy=https://proxy.${_mirror}.intel.com:912
+    export https_proxy=$http_proxy
     export HTTPS_PROXY=$https_proxy
-    export ftp_proxy=ftp://proxy.${_mirror}.intel.com:911
-    export FTP_PROXY=$ftp_proxy
-    export no_proxy=localhost,.intel.com,10.0.0.0/8
+#    export ftp_proxy=ftp://proxy.${_mirror}.intel.com:911
+#    export FTP_PROXY=$ftp_proxy
+    export no_proxy=localhost,.nxp.com,10.0.0.0/8
     export NO_PROXY=$no_proxy
-    export all_proxy=socks://proxy.${_mirror}.intel.com:1080
-    export ALL_PROXY=$all_proxy
-    export GIT_PROXY_COMMAND=${HOME}/.local/bin/socks-gw
+#    export all_proxy=socks://proxy.${_mirror}.intel.com:1080
+#    export ALL_PROXY=$all_proxy
+    #export GIT_PROXY_COMMAND=${HOME}/.local/bin/socks-gw
 }
-setup_perforce()
+unset_proxy()
+{
+    unset http_proxy
+    unset HTTP_PROXY
+    unset https_proxy
+    unset HTTPS_PROXY
+#    unset ftp_proxy
+#    unset FTP_PROXY
+    unset no_proxy
+    unset NO_PROXY
+#    unset all_proxy
+#    unset ALL_PROXY
+    unset GIT_PROXY_COMMAND
+}
+set_perforce()
 {
     export P4DIFF=diff
     export P4USER=amnegrea
     export P4CLIENT=amnegrea_amnegrea-git
     export P4PORT=ssl:p4proxy11.devtools.intel.com:2210
 }
-setup_display()
+set_display()
 {
     #localhost:10.0
     export DISPLAY=:0
@@ -143,8 +157,8 @@ EXT_COLOR()
 #alias tar='tar --use-compress-program=pigz'
 
 HISTCONTROL="ignoredups:erasedups:ignorespace"
-HISTSIZE=1048576
-HISTFILESIZE=1048576
+HISTSIZE=104857600
+HISTFILESIZE=104857600
 LAST_HISTORY_WRITE=$SECONDS
 
 prompt_command() {
@@ -189,11 +203,11 @@ __android_extra() {
     fi
 }
 
-
-separator=$(printf "\[\033[48;5;17m\]%${COLUMNS}s\[\033[0m\]")
+export PROMPT_DIRTRIM=2
+separator=$(printf "\[\033[48;5;52m\]%${COLUMNS}s\[\033[0m\]")
 #export PS1='\j--'${OLDPWD}${separator}'\n\[\033[01;32m\]\u@\h\[\033[01;31m\]'$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$ \e[0m'
 # Non-printable sequences should be enclosed in \[ \]
-export PS1="${separator}\n\j\[\033[01;32m\]\u@\h\[\033[01;31m\]"$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$\[\033[0m\] '
+export PS1="${separator}\n\[\033[01;32m\]\u@\h\[\033[01;31m\]"$_extra_git'$(__android_extra)\[\033[01;33m\]\W\[\033[48;5;52m\]\j\[\033[0m\]\$\[\033[0m\] '
 [ -n "$SCHROOT_CHROOT_NAME" ] && export PS1="${PS1}+ "
 #http://linux-sxs.org/housekeeping/lscolors.html
 #export LS_COLORS='di=01;96:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
@@ -222,17 +236,16 @@ bind '"\eOD":backward-word'
 #"\e[5D": backward-word
 
 
-export CCACHE_CPP2=yes
-export CCACHE_SLOPPINESS="time_macros,include_file_mtime,file_macro"
+ccache -o run_second_cpp="true" -o sloppiness="time_macros,include_file_mtime,file_macro"
 ccache -M 30G > /dev/null
 
-setup_editor
-setup_locales
-export_path
-aliases
-#setup_proxy
-setup_perforce
-setup_display
+set_editor
+set_locales
+set_path
+set_aliases
+set_proxy
+set_perforce
+set_display
 
 _workjump() {
         local cur

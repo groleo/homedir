@@ -1,9 +1,8 @@
 #!/bin/sh
 
-echo $1 |grep "\.intel\.com$" > /dev/null 2>&1
+echo $1 |grep "\.nxp\.com$" > /dev/null 2>&1
 if [ $? -eq 0 ]; then
         connect $@
 else
-        #connect -S proxy.jf.intel.com:1080 $@
-        connect -S proxy-ir.intel.com:1080 $@
+        connect -S emea.nics.nxp.com:1080 $@
 fi

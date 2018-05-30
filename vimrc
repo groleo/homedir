@@ -15,9 +15,10 @@ endif
 if has('gui_running')
     set guioptions=-m
     set guioptions=-M
-    if has("gui_gtk2")
-        set guifont=Terminus\ 13
-    endif
+    set guioptions=aA
+    "if has("gui_gtk2")
+    "    set guifont=Terminus\ 13
+    "endif
 endif
 
 set t_Co=256
@@ -73,7 +74,7 @@ set list listchars=tab:\|-,trail:.,extends:>
 set foldenable          "when off, all folds are open
 set foldmethod=marker
 set foldmarker={,}
-set foldcolumn=1
+set foldcolumn=0
 let mapleader = "\\"
 "set esckeys
 
@@ -96,29 +97,32 @@ set timeoutlen=1000 ttimeoutlen=0
 " Bindings
 "-------------------------------------
 " Make shift-insert work like in Xterm
-map  <S-Insert> <MiddleMouse>
-map! <S-Insert> <MiddleMouse>
-map  <F1> :sus<CR>
-map! <F1> <esc>:sus<CR>a
-map  <F2> :w!<CR>
-map! <F2> <esc>:w!<CR>a
-map  <F3> f{V%
-map! <F3> <esc>:
+noremap  <S-Insert> <MiddleMouse>
+noremap! <S-Insert> <MiddleMouse>
+noremap  <F1> :sus<CR>
+noremap! <F1> <esc>:sus<CR>a
+noremap  <F2> :w!<CR>
+noremap! <F2> <esc>:w!<CR>a
+noremap  <F3> f{V%
+noremap! <F3> <esc>:
 set pastetoggle=<F4>
-map  <F5> :call Make()<CR>
-map! <F5> <esc>:call Make()<CR>i
-map  <F6> :cn<CR>
-map! <F6> <esc>:cn<CR>i
+noremap  <F5> :call Make()<CR>
+noremap! <F5> <esc>:call Make()<CR>i
+noremap  <F6> :cn<CR>
+noremap! <F6> <esc>:cn<CR>i
 
-map  <F7>  :silent w !xclip<CR><CR>
-map  [18~  :silent w !xclip<CR><CR>
-vmap <F7>  "*y
+noremap  <F7>  :!xclip -f -sel clip<CR>
+noremap  [18~  :!xclip -f -sel clip<CR>
+"vmap <F7>  "*y
+"vmap "+y :!xclip -f -sel clip
 vmap [18~  "*y
+
 "Copy to clipboard
-map <F8> "+y
+noremap <F8> "+y
+
 " Paste from clipboard
-map <S-F8> "+gP
-map [32~ "+gP
+noremap <S-F8> "+gP
+noremap [32~ "+gP
 vmap <S-F8> <esc>"+gPi
 vmap [32~ <esc>"+gPi
 
@@ -202,19 +206,20 @@ noremap <silent> <Leader>0 :tabn 10<CR>
 "C-T - Jump back from the definition.
 "C-W C-] - Open the definition in a horizontal split
 "C-\ - Open the definition in a new tab
-map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
+"map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 "A-] - Open the definition in a vertical split
-map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
-map <C-F12> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+map <C-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
 map - :Explore<cr>
+map <C-\> :exec("Doxf ".expand("<cword>"))<CR>
+noremap ; :exec("Doxd ".expand("<cword>"))<CR>
 
 
 
 " Match redundant whitspaces
 highlight RedundantSpaces guibg=green ctermbg=green
 match RedundantSpaces /\s\+$\| \+\ze\t/
-"highlight Folded         term=standout ctermfg=4 ctermbg=248 guifg=#b0d0e0 guibg=#305060
-"highlight FoldColumn     term=standout ctermfg=8 ctermbg=248 guifg=#b0d0e0 guibg=#305060
+"highlight Folded         cterm=standout ctermfg=4 ctermbg=248 guifg=#b0d0e0 guibg=#305060
+"highlight FoldColumn     cterm=standout ctermfg=8 ctermbg=248 guifg=#b0d0e0 guibg=#305060
 
 
 
@@ -242,7 +247,7 @@ autocmd BufReadPost * :DetectIndent
 " Set an orange cursor in Insert mode, and red cursor otherwise.
 " Works at least for xterm and rxvt terminals
 " Does not work at least for gnome terminal, konsole, xfce4-terminal
-"if &term =~ "xterm\\|rxvt\\|screen"
+"if &cterm =~ "xterm\\|rxvt\\|screen"
 "  :silent !echo -ne "\033]12;red\007"
 "  let &t_SI = "\033]12;orange\007"
 "  let &t_EI = "\033]12;red\007"

@@ -7,7 +7,7 @@ set -e
 ###########################################
 install_packages()
 {
-	_basic="rxvt-unicode-256color vim vim-gtk vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server xclip"
+	_basic="jq rxvt-unicode-256color vim vim-gtk vim-doc vim-scripts ctags mc indent unzip tmux autojump htop wdiff openssh-server xclip"
 	_dev="python-pip cmake make gdb ccache strace cdecl flex bison libsqlite3-dev sqlite3-doc python-pysqlite2"
 	_mesa="g++ xsltproc libexpat1 libexpat1-dev libudev-dev gettext libffi-dev libffi6 libmtdev-dev libjpeg-dev libpam0g-dev"
 	_wayland="autoconf libtool sudo autopoint intltool"
@@ -24,7 +24,7 @@ install_packages()
 		#ia32-libs lib32ncurses5 lib32stdc++6 \
 		#devscripts \
 
-#	sudo apt-get remove unity-webapps-common
+#	sudo apt-get remove unity-webapps-common popularity-contest update-notifier ubuntu-release-upgrader-core mlocate
 }
 
 ###########################################
@@ -56,15 +56,17 @@ setup_git()
 	git config --global alias.l1 "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
 }
 ###############################
-install_packages
-setup_git
+#install_packages
+#setup_git
 
 inside_homedir() {
 	origin_url="$(git config remote.origin.url || true)"
 	if [ "$origin_url" = "https://github.com/groleo/homedir.git" ]; then
 		echo 1
+		return
 	fi
 	echo 0
+	return
 }
 
 if [ -d homedir ]; then
@@ -72,9 +74,11 @@ if [ -d homedir ]; then
 	git pull
 else
 	# check if we're already cd-ed inside homedir
-	if [ $(inside_homedir) -eq 1 ]; then
+	IN="$(inside_homedir)"
+	if [ "$IN" = "1" ]; then
 		git pull
 	else
+		echo "NOT IN HOMEDIR:$IN"
 		git clone https://github.com/groleo/homedir.git
 		cd homedir
 	fi
@@ -152,7 +156,7 @@ rm -rf vim-fswitch fswitch-*.zip*
 
 wget 'https://raw.github.com/ciaranm/detectindent/master/plugin/detectindent.vim' -O ${HOME}/.vim/plugin/detectindent.vim
 wget 'http://www.vim.org/scripts/download_script.php?src_id=7645' -O ${HOME}/.vim/plugin/grep.vim
-wget 'http://www.vim.org/scripts/download_script.php?src_id=7218' -O ${HOME}/.vim/plugin/a.vim
+wget 'https://vim.sourceforge.io/scripts/download_script.php?src_id=7218' -O ${HOME}/.vim/plugin/a.vim
 
 #wget https://github.com/vimwiki/vimwiki/archive/master.zip
 
@@ -160,4 +164,4 @@ wget 'http://www.vim.org/scripts/download_script.php?src_id=7218' -O ${HOME}/.vi
 gcc connect.c -o ${HOME}/.local/bin/connect
 if [ $(inside_homedir) -eq 0 ]; then
 	mv install.sh homedir
-endif
+fi
