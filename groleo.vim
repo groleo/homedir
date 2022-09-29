@@ -45,9 +45,10 @@ highlight ModeMsg             ctermfg=011  ctermbg=009  cterm=NONE   guifg=#ffff
 highlight PmenuSel            ctermfg=011  ctermbg=009  cterm=NONE   guifg=#ffff00 guibg=#ff0000 gui=NONE
 highlight WarningMsg          ctermfg=011  ctermbg=009  cterm=bold   guifg=#ffff00 guibg=#ff0000 gui=bold
 highlight String              ctermfg=056  ctermbg=NONE cterm=NONE   guifg=#5f00d7 guibg=NONE    gui=NONE
-highlight Pmenu               ctermfg=008  ctermbg=018  cterm=NONE   guifg=#808080 guibg=#000087 gui=NONE
+highlight Pmenu               ctermfg=010  ctermbg=018  cterm=NONE   guifg=#808080 guibg=#000087 gui=NONE
 highlight SpecialChar         ctermfg=009  ctermbg=NONE cterm=NONE   guifg=#ff0000 guibg=NONE    gui=NONE
 highlight SpecialKey          ctermfg=008  ctermbg=NONE cterm=NONE   guifg=#808080 guibg=NONE    gui=NONE
+highlight WildMenu            ctermfg=15   ctermbg=241  cterm=NONE   guifg=#808080 guibg=NONE    gui=NONE
 
 highlight SpellBad            ctermfg=015  ctermbg=001  cterm=NONE   guifg=#ffffff guibg=#800000 gui=NONE
 highlight StatusLine          ctermfg=241  ctermbg=NONE cterm=NONE   guifg=#626262 guibg=NONE    gui=NONE
@@ -61,6 +62,7 @@ highlight TabLineSel          ctermfg=011  ctermbg=009  cterm=bold   guifg=#ffff
 highlight TabLineFill         ctermfg=NONE ctermbg=012  cterm=NONE   guifg=NONE    guibg=#0000ff gui=NONE
 highlight Comment             ctermfg=198  ctermbg=NONE cterm=bold   guifg=#ff0087 guibg=NONE    gui=bold
 highlight CursorLine          ctermfg=NONE ctermbg=042  cterm=bold   guifg=NONE    guibg=#00d787 gui=bold
+highlight ColorColumn         ctermfg=NONE ctermbg=252 guifg=bg guibg=fg
 highlight Delimiter           ctermfg=012  ctermbg=NONE cterm=NONE   guifg=#0000ff guibg=NONE    gui=NONE
 highlight FoldColumn          ctermfg=116  ctermbg=023  cterm=NONE   guifg=#87d7d7 guibg=#005f5f gui=NONE
 highlight Folded              ctermfg=195  ctermbg=023  cterm=bold   guifg=#b0d0e0 guibg=#305060 gui=bold
@@ -70,8 +72,14 @@ highlight Visual              ctermfg=000  ctermbg=067  cterm=NONE   guifg=#0000
 highlight Function            ctermfg=028  ctermbg=NONE cterm=bold   guifg=#008700 guibg=NONE    gui=bold
 highlight PmenuSbar           ctermbg=018  ctermbg=NONE cterm=NONE   guifg=#008700 guibg=NONE    gui=NONE
 
+" for vimdiff
+highlight DiffAdd             cterm=NONE ctermfg=24 ctermbg=225
+highlight DiffChange          cterm=NONE ctermfg=5 ctermbg=218
+highlight DiffDelete          cterm=NONE ctermfg=0 ctermbg=231
+highlight DiffText            cterm=NONE ctermfg=0 ctermbg=200
+
+" .diff file
 highlight diffDelete          ctermfg=012  ctermbg=159  cterm=bold   guifg=#0000ff guibg=#afffff gui=bold
-highlight diffAdded           ctermfg=130  ctermbg=NONE cterm=bold   guifg=#af5f00 guibg=NONE    gui=bold
 highlight diffOldFile         ctermfg=012  ctermbg=051  cterm=bold   guifg=#ff9cf1 guibg=#00ffff gui=bold
 highlight diffNewFile         ctermfg=012  ctermbg=051  cterm=bold   guifg=#ff9cf1 guibg=#00ffff gui=bold
 
