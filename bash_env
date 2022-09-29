@@ -2,8 +2,8 @@
 
 set_editor()
 {
-    export EDITOR=/usr/bin/vimx
-    export VISUAL=/usr/bin/vimx
+    export EDITOR=/usr/bin/vim
+    export VISUAL=/usr/bin/vim
 }
 set_locales()
 {
@@ -23,12 +23,9 @@ set_locales()
     export LC_IDENTIFICATION="en_US.utf8"
     #export LC_ALL=en_US.UTF-8
 }
-set_path() {
-    EXTRA_PATH=/usr/share/ant/bin
-    #EXTRA_PATH=${EXTRA_PATH}:${HOME}/workspace/HorseTooth/scripts/tools/build/bin
-    EXTRA_PATH=${EXTRA_PATH}:${HOME}/workspace/chromium/depot_tools:${HOME}/.local/bin:/opt/java/jdk1.7.0_79/bin
-    EXTRA_PATH=${EXTRA_PATH}:${HOME}/.local/opt/p4v-2015.1.1233444/bin/
-    EXTRA_PATH=${EXTRA_PATH}:/opt/intel/vtune_amplifier_for_systems/bin64/
+set_path()
+{
+    EXTRA_PATH=${HOME}/.local/bin
     export PATH=${PATH##$EXTRA_PATH}
     export PATH=${EXTRA_PATH}:${PATH}
 }
@@ -39,29 +36,23 @@ set_aliases()
     alias cd-="cd -"
     alias l1='ls -1'
     alias tmux='tmux -2 -u'
-    alias f=fg
     alias vi=vim
     alias ls='ls --color'
+    alias f=fg
+    alias wk="cd ~/workspace/"
 }
-
 Cgrep()
 {
     find . -iname '*.c' -o -iname '*.h' -o -iname '*.hpp' -o -iname '*.cpp' | xargs grep -n --color=always --exclude='*.orig' --exclude='tags' --exclude-dir='.hg' --exclude-dir='.git' --exclude-dir='out' $*
 }
 set_proxy()
 {
-    _mirror=jf
-    export http_proxy=http://emea.nics.nxp.com:8080
+    export http_proxy=""
     export HTTP_PROXY=$http_proxy
     export https_proxy=$http_proxy
     export HTTPS_PROXY=$https_proxy
-#    export ftp_proxy=ftp://proxy.${_mirror}.intel.com:911
-#    export FTP_PROXY=$ftp_proxy
     export no_proxy=localhost,.nxp.com,10.0.0.0/8
     export NO_PROXY=$no_proxy
-#    export all_proxy=socks://proxy.${_mirror}.intel.com:1080
-#    export ALL_PROXY=$all_proxy
-    #export GIT_PROXY_COMMAND=${HOME}/.local/bin/socks-gw
 }
 unset_proxy()
 {
@@ -69,162 +60,138 @@ unset_proxy()
     unset HTTP_PROXY
     unset https_proxy
     unset HTTPS_PROXY
-#    unset ftp_proxy
-#    unset FTP_PROXY
     unset no_proxy
     unset NO_PROXY
-#    unset all_proxy
-#    unset ALL_PROXY
-    unset GIT_PROXY_COMMAND
-}
-set_perforce()
-{
-    export P4DIFF=diff
-    export P4USER=amnegrea
-    export P4CLIENT=amnegrea_amnegrea-git
-    export P4PORT=ssl:p4proxy11.devtools.intel.com:2210
-}
-set_display()
-{
-    #localhost:10.0
-    export DISPLAY=:0
-}
-setup_android()
-{
-    export LFSTK_BIN=/opt/lfstk.1.8.6/bin/lfstk
-    export LFSTK_KEY_DIR=${HOME}/local/fstk-keys
-    export CLASSPATH=.
-    export JAVA_FONTS=/usr/share/fonts/truetype
-    export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/
-    export ANT_HOME=/usr/share/ant
 }
 cmm()
 {
-	mm 2>&1 $* \
-	| ack --flush --passthru --color --color-match=red "^.*: error.*" \
-	| ack --flush --passthru --color --color-match=red "^.*: fatal error.*" \
-	| ack --flush --passthru --color --color-match=yellow "^.*: warning:.*" \
-	| ack --flush --passthru --color --color-match=red ".*undefined reference to*" \
-	| ack --flush --passthru --color --color-match=red ".*No rule to make target.*" \
-	| ack --flush --passthru --color --color-match=red ".*multiple definition of.*" | tee /tmp/log
-	RV=${PIPESTATUS[0]}
+    mm 2>&1 $* \
+        | ack --flush --passthru --color --color-match=red "^.*: error.*" \
+        | ack --flush --passthru --color --color-match=red "^.*: fatal error.*" \
+        | ack --flush --passthru --color --color-match=yellow "^.*: warning:.*" \
+        | ack --flush --passthru --color --color-match=red ".*undefined reference to*" \
+        | ack --flush --passthru --color --color-match=red ".*No rule to make target.*" \
+        | ack --flush --passthru --color --color-match=red ".*multiple definition of.*" | tee /tmp/log
+            RV=${PIPESTATUS[0]}
 
-	grep "Install:" /tmp/log > /tmp/install
-	sed -e 's/Install:/c push/' -i /tmp/install
-	mv /tmp/install .
-	chmod +x install
-	rm /tmp/log
-	return $RV
-}
+            grep "Install:" /tmp/log > /tmp/install
+            sed -e 's/Install:/c push/' -i /tmp/install
+            mv /tmp/install .
+            chmod +x install
+            rm /tmp/log
+            return $RV
+        }
 
 #
 #  Utilitary functions
 #
 col()
 {
-	$* \
-	| ack --flush --passthru --color --color-match=red "^.*: error.*" \
-	| ack --flush --passthru --color --color-match=red "^.*: fatal error.*" \
-	| ack --flush --passthru --color --color-match=yellow "^.*: warning:.*" \
-	| ack --flush --passthru --color --color-match=red ".*undefined reference to*" \
-	| ack --flush --passthru --color --color-match=red ".*No rule to make target.*" \
-	| ack --flush --passthru --color --color-match=red ".*multiple definition of.*" | tee /tmp/log
-	return ${PIPESTATUS[0]}
-}
-shgrep()
-{
-	local d=${2:-.}
-	find $d -type f \( -name CMakeLists.txt -o -name "Kconfig" -o -name '*.sh' -o -name '*.mk' -o -iname 'makefile*' -a ! -name '*.orig' \) -print0 | xargs -0 grep --color -n "$@"
-}
+    $* \
+        | ack --flush --passthru --color --color-match=red "^.*: error.*" \
+        | ack --flush --passthru --color --color-match=red "^.*: fatal error.*" \
+        | ack --flush --passthru --color --color-match=yellow "^.*: warning:.*" \
+        | ack --flush --passthru --color --color-match=red ".*undefined reference to*" \
+        | ack --flush --passthru --color --color-match=red ".*No rule to make target.*" \
+        | ack --flush --passthru --color --color-match=red ".*multiple definition of.*" | tee /tmp/log
+            return ${PIPESTATUS[0]}
+        }
+    shgrep()
+    {
+        local d=${2:-.}
+        find $d -type f \( -name CMakeLists.txt -o -name "Kconfig" -o -name '*.sh' -o -name '*.mk' -o -iname 'makefile*' -a ! -name '*.orig' \) -print0 | xargs -0 grep --color -n "$@"
+    }
 mkgrep()
 {
-	find . -type f \( -name 'Android*.mk' -a ! -name '*.orig' \) -print0 | xargs -0 grep --color -n "$@"
+    find . -type f \( -name 'Android*.mk' -a ! -name '*.orig' \) -print0 | xargs -0 grep --color -n "$@"
 }
 hgrep ()
 {
-	find . -name .repo -prune -o -name .git -prune -o -type f \(  -name '*.h' \) -print0 | xargs -0 grep --color -n "$@"
+    find . -name .repo -prune -o -name .git -prune -o -type f \(  -name '*.h' \) -print0 | xargs -0 grep --color -n "$@"
+}
+
+set_ccache()
+{
+    export CCACHE_DIR=/compile-cache/ccache/
+    ccache -o run_second_cpp="true" -o sloppiness="time_macros,include_file_mtime,file_macro"
+    ccache -M 30G > /dev/null
 }
 EXT_COLOR()
 {
     echo -ne "\[\033[38;5;$1m\]";
 }
-
-
-#setterm -blength 0
-#export ADBHOST=10.237.104.13
-#XDG_CONFIG_DIRS="/etc/xdg:$HOME/.local/etc/xdg"
-#XDG_DATA_DIRS="$HOME/.local/share:/usr/share:/usr/local/share"
-#alias tar='tar --use-compress-program=pigz'
-
-HISTCONTROL="ignoredups:erasedups:ignorespace"
-HISTSIZE=104857600
-HISTFILESIZE=104857600
-LAST_HISTORY_WRITE=$SECONDS
-
-prompt_command() {
-#	if [ $(($SECONDS - $LAST_HISTORY_WRITE)) -gt 60 ]; then
-		history -a && history -c && history -r
-#		LAST_HISTORY_WRITE=$SECONDS
-#	fi
+set_history()
+{
+    HISTCONTROL="ignoredups:erasedups:ignorespace"
+    HISTSIZE=104857600
+    HISTFILESIZE=104857600
+    LAST_HISTORY_WRITE=$SECONDS
 }
 
-PROMPT_COMMAND="prompt_command"
-export HISTCONTROL HISTSIZE HISTFILESIZE PROMPT_COMMAND
-shopt -s histappend
-shopt -s checkwinsize
+prompt_command() {
+    #if [ $(($SECONDS - $LAST_HISTORY_WRITE)) -gt 60 ]; then
+    history -a && history -c && history -r
+    #LAST_HISTORY_WRITE=$SECONDS
+    #fi
+}
 
-export GIT_PS1_SHOWDIRTYSTATE=1
-export GIT_PS1_SHOWSTASHSTATE=1
-export GIT_PS1_SHOWUNTRACKEDFILES=1
+set_git_prompt() {
+    PROMPT_COMMAND="prompt_command"
+    export HISTCONTROL HISTSIZE HISTFILESIZE PROMPT_COMMAND
+    shopt -s histappend
+    shopt -s checkwinsize
 
-[[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh
-[[ -s /usr/share/autojump/autojump.bash ]] && source /usr/share/autojump/autojump.bash
+    export GIT_PS1_SHOWDIRTYSTATE=1
+    export GIT_PS1_SHOWSTASHSTATE=1
+    export GIT_PS1_SHOWUNTRACKEDFILES=1
 
-_extra_git='X'
-#Debian
-if [ -f /etc/bash_completion.d/git-prompt ] ; then
-    source /etc/bash_completion.d/git-prompt
-    _extra_git='[$(__git_ps1 "%s")]'
-fi
-if [ -f /etc/bash_completion.d/git ]; then
-    source /etc/bash_completion.d/git
-    _extra_git='[$(__git_ps1 "%s")]'
-fi
+    [[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh
+    [[ -s /usr/share/autojump/autojump.bash ]] && source /usr/share/autojump/autojump.bash
 
-# Fedora
-if [ -f /usr/share/git-core/contrib/completion/git-prompt.sh ]; then
-    source /usr/share/git-core/contrib/completion/git-prompt.sh
-    _extra_git='[$(__git_ps1 "%s")]'
-fi
+    _extra_git='X'
+    #Debian
+    if [ -f /etc/bash_completion.d/git-prompt ] ; then
+        source /etc/bash_completion.d/git-prompt
+        _extra_git='[$(__git_ps1 "%s")]'
+    fi
+    if [ -f /etc/bash_completion.d/git ]; then
+        source /etc/bash_completion.d/git
+        _extra_git='[$(__git_ps1 "%s")]'
+    fi
 
-__android_extra() {
-    if [ "$ANDROID_PRODUCT_OUT" != "" ]; then
-        echo -n "[$(basename $ANDROID_PRODUCT_OUT)]"
+    # Fedora
+    if [ -f /usr/share/git-core/contrib/completion/git-prompt.sh ]; then
+        source /usr/share/git-core/contrib/completion/git-prompt.sh
+        _extra_git='[$(__git_ps1 "%s")]'
     fi
 }
 
-export PROMPT_DIRTRIM=2
-separator=$(printf "\[\033[48;5;52m\]%${COLUMNS}s\[\033[0m\]")
-#export PS1='\j--'${OLDPWD}${separator}'\n\[\033[01;32m\]\u@\h\[\033[01;31m\]'$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$ \e[0m'
-# Non-printable sequences should be enclosed in \[ \]
-export PS1="${separator}\n\[\033[01;32m\]\u@\h\[\033[01;31m\]"$_extra_git'$(__android_extra)\[\033[01;33m\]\W\[\033[48;5;52m\]\j\[\033[0m\]\$\[\033[0m\] '
-[ -n "$SCHROOT_CHROOT_NAME" ] && export PS1="${PS1}+ "
-#http://linux-sxs.org/housekeeping/lscolors.html
-#export LS_COLORS='di=01;96:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
-#export LS_COLORS="di=01;37"
-LS_COLORS="no=0;93:rs=0:di=01;37:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:"
+
+set_ps1() {
+    export PROMPT_DIRTRIM=2
+    export PROMPT_COMMAND="$PROMPT_COMMAND;pwd>/tmp/pwd"
+    separator=$(printf "\[\033[48;5;52m\]%${COLUMNS}s\[\033[0m\]")
+    #separator=$(perl -e "print '_'x${COLUMNS}")
+    #export PS1='\j--'${OLDPWD}${separator}'\n\[\033[01;32m\]\u@\h\[\033[01;31m\]'$_extra_git'$(__android_extra)\[\033[01;33m\]\W \$ \e[0m'
+    # Non-printable sequences should be enclosed in \[ \]
+    #export PS1="${separator}\n\[\033[01;30m\]\u@\h\[\033[01;31m\]"$_extra_git'\[\033[01;31m\]\W\[\033[48;5;52m\]\j\[\033[0m\]\$\[\033[0m\] '
+    export PS1="${separator}\n\[\033[01;33m\]\u@\h\[\033[01;31m\]"$_extra_git"\[\033[01;31m\]\W\[\033[48;5;52m\]\j\[\033[0m\]\$\[\033[0m\] "
+    [ -n "$SCHROOT_CHROOT_NAME" ] && export PS1="${PS1}+ "
+}
 
 case "$-" in
     *i*)
-    bind -x '"\eOP":" fg"'
+    bind -x '"\eOP":" fg&>/dev/null"'
     set bell-style none
 esac
 
 export TERMINFO=${HOME}/.local/terminfo
 
 #use ctl keys to move forward and back in words
-bind '"\eOC":forward-word'
-bind '"\eOD":backward-word'
+if [[ "${SHELLOPTS}" =~ :(emacs|vi): ]] ; then
+    bind '"\eOC":forward-word'
+    bind '"\eOD":backward-word'
+fi
 #bind '"\e\e[C": forward-word'
 #bind '"\e\e[D": backward-word'
 #bind '"\e[D":backward-word'
@@ -235,17 +202,16 @@ bind '"\eOD":backward-word'
 #"\e[5C": forward-word
 #"\e[5D": backward-word
 
-
-ccache -o run_second_cpp="true" -o sloppiness="time_macros,include_file_mtime,file_macro"
-ccache -M 30G > /dev/null
-
+set_history
 set_editor
 set_locales
 set_path
 set_aliases
-set_proxy
-set_perforce
-set_display
+#set_proxy
+#set_display
+#set_ccache
+set_git_prompt
+set_ps1
 
 _workjump() {
         local cur
